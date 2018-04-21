@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://DefaultNamespace" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://DefaultNamespace" xmlns:intf="http://DefaultNamespace" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://DefaultNamespace" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="registerCar">
+    <complexType>
+     <sequence>
+      <element name="vin" type="xsd:string"/>
+      <element name="model" type="xsd:string"/>
+      <element name="make" type="xsd:string"/>
+      <element name="year" type="xsd:int"/>
+      <element name="weight" type="xsd:double"/>
+      <element name="parts" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="registerCarResponse">
+    <complexType>
+     <sequence>
+      <element name="registerCarReturn" type="xsd:int"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="registerCarRequest">
+
+      <wsdl:part element="impl:registerCar" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerCarResponse">
+
+      <wsdl:part element="impl:registerCarResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:portType name="LocalServer">
+
+      <wsdl:operation name="registerCar">
+
+         <wsdl:input message="impl:registerCarRequest" name="registerCarRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:registerCarResponse" name="registerCarResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="LocalServerSoapBinding" type="impl:LocalServer">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="registerCar">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="registerCarRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="registerCarResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="LocalServerService">
+
+      <wsdl:port binding="impl:LocalServerSoapBinding" name="LocalServer">
+
+         <wsdlsoap:address location="http://localhost:8080/Course_Assignment/services/LocalServer"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

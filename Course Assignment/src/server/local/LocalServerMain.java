@@ -12,11 +12,11 @@ import models.Car;
 import models.Part;
 import server.Server;
 
-public class LocalServer extends UnicastRemoteObject implements LocalServerInterface{
+public class LocalServerMain extends UnicastRemoteObject implements LocalServerInterface{
 
 	private Server server;
 	
-	public LocalServer() throws RemoteException {
+	public LocalServerMain() throws RemoteException {
 		super();
 		try 
 		{
@@ -54,9 +54,9 @@ public class LocalServer extends UnicastRemoteObject implements LocalServerInter
 		// test 
 		
 		ArrayList<Part> parts = new ArrayList<Part>();
-		parts.add(new Part(6.7, 777, "engine"));
+		//parts.add(new Part(6.7, 777, "engine"));
 		
-		Car car = new Car(weight, make, model, year, VIN, parts);
+		//Car car = new Car(weight, make, model, year, VIN, parts);
 		
 		System.out.println("Attempting to start client..");
 		
@@ -64,13 +64,13 @@ public class LocalServer extends UnicastRemoteObject implements LocalServerInter
 		
 		try 
 		{
-			LocalServer local = new LocalServer();
+			//LocalServer local = new LocalServer();
 			
-			int result = local.registerCar(car);
+			//int result = local.registerCar(car);
 			
-			System.out.println(result);
+			//System.out.println(result);
 		} 
-		catch (RemoteException e) {
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

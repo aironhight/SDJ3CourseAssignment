@@ -2,7 +2,8 @@ package models;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Car implements Serializable{
+public class Car implements Serializable
+{
 	private double weight;
 	private String make;
 	private String model;
@@ -10,12 +11,12 @@ public class Car implements Serializable{
 	private String VIN;
 	private ArrayList<Part> parts;
 	
-	public Car(double weight, String make, String model, int year, String vIN, ArrayList<Part> parts) {
+	public Car(String VIN, String model, String make, int year, double weight, ArrayList<Part> parts) {
 		this.weight = weight;
 		this.make =  make;
 		this.model = model;
 		this.year = year;
-		VIN = vIN;
+		this.VIN = VIN;
 		this.parts = parts;
 	}
 
