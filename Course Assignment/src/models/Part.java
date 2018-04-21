@@ -1,6 +1,8 @@
 package models;
 
-public class Part {
+import java.io.Serializable;
+
+public class Part implements Serializable{
 	private double weight;
 	private int carVIN;
 	private String type;
