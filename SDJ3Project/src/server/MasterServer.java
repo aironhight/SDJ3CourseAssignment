@@ -47,7 +47,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	@Override
 	public String trackPart(String carVin) throws RemoteException {
-		return "kurwo mamichkata ti da iba";
+		return "kurwa e maika ti";
 	}
 
 	@Override
