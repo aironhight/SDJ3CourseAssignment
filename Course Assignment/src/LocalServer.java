@@ -1,20 +1,33 @@
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import models.*;
+import server.local.LocalServerMain;
 
 import org.json.*;
 
 public class LocalServer 
 {
 	private ArrayList<Car> cars;
+	private LocalServerMain main;
 		
 	public LocalServer()
 	{
 		cars = new ArrayList<>();
+		main = null;
+		
+		try {
+			
+			main = new LocalServerMain();
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
-	public int registerCar(String vin, String model, String make, int year, double weight, String parts)
+	public boolean registerCar(String vin, String model, String make, int year, double weight, String parts)
 	{
 		try {
 			
@@ -31,15 +44,30 @@ public class LocalServer
 				partsArr.add(part);
 			}
 			
-			cars.add(new Car(vin, model, make, year, weight, partsArr));
+			System.out.println(vin + " " + model + " " + make + " " + year + " " + weight + " " + partsArr);
 			
-			return 1;
+			Car newCar = new Car(vin, model, make, year, weight, partsArr);
+			
+			cars.add(newCar);
+			
+			try {
+				
+				main.registerCar(newCar);
+				
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
+				return false;
+			}
+			
+			return true;
 		
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return 0;
+		return false;
 	}
 }
