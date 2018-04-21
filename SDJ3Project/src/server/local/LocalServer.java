@@ -5,7 +5,11 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import models.Car;
+import models.Part;
 import server.Server;
 
 public class LocalServer extends UnicastRemoteObject implements LocalServerInterface{
@@ -27,9 +31,32 @@ public class LocalServer extends UnicastRemoteObject implements LocalServerInter
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
 		
-		System.out.println("Enter the desired car details");
+		System.out.println("Enter car make");
 		
-		String s = input.nextLine();
+		String make = input.nextLine();
+		
+		System.out.println("Enter car model");
+		
+		String model = input.nextLine();
+		
+		System.out.println("Enter car weight");
+		
+		double weight = Double.parseDouble(input.nextLine());
+		
+		System.out.println("Enter car year");
+		
+		int year = Integer.parseInt(input.nextLine());
+		
+		System.out.println("Enter car VIN");
+		
+		String VIN = input.nextLine();
+		
+		// kurwa
+		
+		ArrayList<Part> parts = new ArrayList<Part>();
+		parts.add(new Part(6.7, 777, "engine"));
+		
+		Car car = new Car(weight, make, model, year, VIN, parts);
 		
 		System.out.println("Attempting to start client..");
 		
@@ -39,7 +66,9 @@ public class LocalServer extends UnicastRemoteObject implements LocalServerInter
 		{
 			LocalServer local = new LocalServer();
 			
-			local.registerCar();
+			int result = local.registerCar(car);
+			
+			System.out.println(result);
 		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -49,7 +78,7 @@ public class LocalServer extends UnicastRemoteObject implements LocalServerInter
 	}
 
 	@Override
-	public void registerCar() throws RemoteException {
-		server.registerCar();
+	public int registerCar(Car car) throws RemoteException {
+		return server.registerCar(car);
 	}
 }

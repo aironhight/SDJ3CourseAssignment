@@ -1,7 +1,8 @@
 package models;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Car {
+public class Car implements Serializable{
 	private double weight;
 	private String make;
 	private String model;

@@ -5,6 +5,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.List;
 
+import models.Car;
+
 public interface LocalServerInterface extends Remote {
-	void registerCar() throws RemoteException;
+	int registerCar(Car car) throws RemoteException;
 }

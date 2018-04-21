@@ -6,15 +6,20 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+
+import models.Car;
 
 public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	private Registry registry;
+	private ArrayList<Car> cars;
 	
 	public MasterServer(int registryPort) throws RemoteException
     {
         super();
         registry = LocateRegistry.createRegistry(registryPort);
+        cars = new ArrayList<Car>();
     }
 
 	
@@ -47,13 +52,21 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	@Override
 	public String trackPart(String carVin) throws RemoteException {
-		return "kurwo mamichkata ti da iba";
+<<<<<<< HEAD
+		return "success!";
+=======
+		return "kurwa e maika ti";
+>>>>>>> 7314523562388eaa532fb48b0749eb46024068b1
 	}
 
 	@Override
-	public void registerCar() throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public int registerCar(Car car) throws RemoteException {
+		cars.add(car);
+		System.out.println(car.toString());
+		if(!cars.contains(car))
+			return 0;
+		else
+			return 1;
 	}
 
 }
