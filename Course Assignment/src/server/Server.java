@@ -11,5 +11,5 @@ import models.Car;
 
 public interface Server extends Remote {
 	String trackPart(String carVin) throws RemoteException;
-	int registerCar(Car car) throws RemoteException;
+	boolean registerCar(Car car) throws RemoteException;
 }

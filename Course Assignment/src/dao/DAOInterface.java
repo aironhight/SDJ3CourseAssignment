@@ -1,5 +1,9 @@
 package dao;
 
-public interface DAOInterface {
+import models.Car;
+
+public interface DAOInterface 
+{
+	void addCar(Car car);
 
 }

@@ -8,21 +8,23 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import dao.DAO;
 import models.Car;
 
 public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	private Registry registry;
 	private ArrayList<Car> cars;
+	private DAO dao;
 	
 	public MasterServer(int registryPort) throws RemoteException
     {
         super();
         registry = LocateRegistry.createRegistry(registryPort);
         cars = new ArrayList<Car>();
+        dao = new DAO();
     }
 
-	
 	public static void main ( String args[] ) throws Exception
     {
 
@@ -56,13 +58,19 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	}
 
 	@Override
-	public int registerCar(Car car) throws RemoteException {
-		cars.add(car);
-		System.out.println(car.toString());
-		if(!cars.contains(car))
-			return 0;
-		else
-			return 1;
+	public boolean registerCar(Car car) throws RemoteException {
+		
+		try {
+			cars.add(car);
+			dao.addCar(car);
+		}
+		catch(Exception e)
+		{
+			System.out.println("DATABASE connection error");
+			
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -23,7 +23,7 @@
  <ns1:handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
  <ns1:handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
  <ns1:service name="LocalServer" provider="java:RPC" style="wrapped" use="literal">
-  <ns2:operation name="registerCar" qname="ns1:registerCar" returnQName="ns1:registerCarReturn" returnType="xsd:int" soapAction="" xmlns:ns1="http://DefaultNamespace" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://xml.apache.org/axis/wsdd/">
+  <ns2:operation name="registerCar" qname="ns1:registerCar" returnQName="ns1:registerCarReturn" returnType="xsd:boolean" soapAction="" xmlns:ns1="http://DefaultNamespace" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://xml.apache.org/axis/wsdd/">
    <ns2:parameter qname="ns1:vin" type="xsd:string"/>
    <ns2:parameter qname="ns1:model" type="xsd:string"/>
    <ns2:parameter qname="ns1:make" type="xsd:string"/>

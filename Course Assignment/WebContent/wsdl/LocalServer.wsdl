@@ -19,7 +19,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <element name="registerCarResponse">
     <complexType>
      <sequence>
-      <element name="registerCarReturn" type="xsd:int"/>
+      <element name="registerCarReturn" type="xsd:boolean"/>
      </sequence>
     </complexType>
    </element>

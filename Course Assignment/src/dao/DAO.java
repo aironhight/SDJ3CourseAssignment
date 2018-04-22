@@ -3,10 +3,13 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DAO 
+import models.Car;
+
+public class DAO implements DAOInterface
 {
 	private Connection conn;
 	
@@ -35,22 +38,30 @@ public class DAO
 	
 	private void buildDDL() 
 	{
-		if (true) {
+		boolean execute = false;
+		
+		if (execute) {
 			
 			
 			try {
 			
-				Statement stmt = conn.createStatement();
+				Statement stm = conn.createStatement();
 				
-				stmt.executeUpdate("CREATE SCHEMA IF NOT EXISTS facility_schema");
+				stm.executeUpdate("CREATE SCHEMA IF NOT EXISTS facility_schema");
 				
-				stmt.executeUpdate("CREATE TABLE cars (carID serial PRIMARY KEY, "
+				stm.close();
+				
+				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE cars (carID serial PRIMARY KEY, "
 						+ "make VARCHAR(10) not null, "
 						+ "model VARCHAR(10) not null, "
 						+ "year int not null,"
 						+ "VIN VARCHAR(10) not null,"
-						+ "weight read not null);");
-			
+						+ "weight real not null)");
+				
+				stmt.executeUpdate();
+				
+				stmt.close();
+				
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -59,9 +70,55 @@ public class DAO
 		}
 	}
 
-	public static void main(String[] args)
+	@Override
+	public void addCar(Car car) {
+		
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO cars (make, model, year, VIN, weight)"
+														 + " VALUES (?, ?, ?, ?, ?) ");
+			
+			stmt.setString(1, car.getMake());
+			stmt.setString(2, car.getModel());
+			stmt.setInt(3, car.getYear());
+			stmt.setString(4, car.getVIN());
+			stmt.setDouble(5, car.getWeight());
+			
+			stmt.executeUpdate();
+			
+			stmt.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		printAllCars();
+	}
+
+	private void printAllCars() 
 	{
-		new DAO();
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM cars");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " #  " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
+				
+				
+			}
+			
+			System.out.println("---------------------------");
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 }

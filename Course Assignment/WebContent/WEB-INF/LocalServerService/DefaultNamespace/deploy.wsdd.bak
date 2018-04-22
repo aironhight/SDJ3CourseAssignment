@@ -20,7 +20,7 @@
       <parameter name="className" value="DefaultNamespace.LocalServerSoapBindingImpl"/>
       <parameter name="wsdlPortType" value="LocalServer"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="registerCar" qname="operNS:registerCar" xmlns:operNS="http://DefaultNamespace" returnQName="retNS:registerCarReturn" xmlns:retNS="http://DefaultNamespace" returnType="rtns:int" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+      <operation name="registerCar" qname="operNS:registerCar" xmlns:operNS="http://DefaultNamespace" returnQName="retNS:registerCarReturn" xmlns:retNS="http://DefaultNamespace" returnType="rtns:boolean" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:vin" xmlns:pns="http://DefaultNamespace" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:model" xmlns:pns="http://DefaultNamespace" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:make" xmlns:pns="http://DefaultNamespace" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>

@@ -29,7 +29,7 @@ public class LocalServerMain extends UnicastRemoteObject implements LocalServerI
 	}
 
 	@Override
-	public int registerCar(Car car) throws RemoteException {
+	public boolean registerCar(Car car) throws RemoteException {
 		return server.registerCar(car);
 	}
 }
