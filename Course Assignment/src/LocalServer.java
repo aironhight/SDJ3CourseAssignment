@@ -21,6 +21,8 @@ public class LocalServer
 			
 			main = new LocalServerMain();
 			
+			System.out.println("Local Server Launched");
+			
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

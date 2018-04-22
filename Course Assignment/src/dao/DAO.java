@@ -68,6 +68,42 @@ public class DAO implements DAOInterface
 			}
 			
 		}
+		
+		if (!execute) {
+
+			
+			/* to be implemented 
+
+			try {
+				PreparedStatement stmt = conn.prepareStatement("");
+				
+				stmt.executeUpdate();
+				
+				stmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			*/
+		}
+	}
+	
+	/* This method deletes all the rows from all the tables */
+	private void deleteEverything()
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM cars");
+			
+			stmt.executeUpdate();
+			
+			stmt.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
