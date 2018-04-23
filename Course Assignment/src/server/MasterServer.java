@@ -9,13 +9,15 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import dao.DAO;
+import dao.DAOInterface;
 import models.Car;
+import models.Part;
 
 public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	private Registry registry;
 	private ArrayList<Car> cars;
-	private DAO dao;
+	private DAOInterface dao;
 	
 	public MasterServer(int registryPort) throws RemoteException
     {
@@ -58,11 +60,15 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	}
 
 	@Override
-	public boolean registerCar(Car car) throws RemoteException {
-		
+	public boolean registerCar(Car car) throws RemoteException 
+	{
 		try {
+			
 			cars.add(car);
-			dao.addCar(car);
+			
+			int carID = dao.addCarRecord(car);
+			
+			addParts(car.disassemble(), carID);
 		}
 		catch(Exception e)
 		{
@@ -71,6 +77,17 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			return false;
 		}
 		return true;
+	}
+
+	private void addParts(ArrayList<Part> parts, int carID) 
+	{
+		for (int i = 0; i < parts.size(); i++) {
+			
+			int palletID = dao.findPalletForPart(parts.get(i));
+					
+			dao.addPartRecord(parts.get(i), carID, palletID);
+		}
+		
 	}
 
 }

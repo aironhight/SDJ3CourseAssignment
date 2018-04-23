@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import models.Car;
+import models.Part;
 
 public class DAO implements DAOInterface
 {
@@ -65,6 +66,7 @@ public class DAO implements DAOInterface
 				stmt = conn.prepareStatement("CREATE TABLE pallet ("
 						+ "palletID serial PRIMARY KEY,"
 						+ "partType varchar(30) not null,"
+						+ "currentWeight real not null,"
 						+ "maximumWeight real not null)");
 				
 				stmt.executeUpdate();
@@ -89,42 +91,21 @@ public class DAO implements DAOInterface
 	
 	private void addPalletsType() throws SQLException 
 	{
-		PreparedStatement stmt = null;
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Engine"); stmt.setDouble(2, 1025.45); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Doors"); stmt.setDouble(2, 425.50); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Windows"); stmt.setDouble(2, 125.145); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Battery"); stmt.setDouble(2, 200.0); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Breakes"); stmt.setDouble(2, 98.756); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Oil System"); stmt.setDouble(2, 105.55); stmt.executeUpdate();
-
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Cooling System"); stmt.setDouble(2, 105.55); stmt.executeUpdate();
-		
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Fuel suply System"); stmt.setDouble(2, 185.0); stmt.executeUpdate();
-
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Suspension"); stmt.setDouble(2, 200.4); stmt.executeUpdate();
-
-		stmt = conn.prepareStatement("INSERT INTO pallet (partType, maximumWeight) VALUES (?, ?)"); 
-		stmt.setString(1, "Transmission System"); stmt.setDouble(2, 440.70); stmt.executeUpdate();
+		addNewPallet("Engine", 1025.45);
+		addNewPallet("Doors", 425.50);
+		addNewPallet("Windows", 125.145);
+		addNewPallet("Battery", 200.0);
+		addNewPallet("Breakes", 98.756);
+		addNewPallet("Oil System", 105.55);
+		addNewPallet("Cooling System", 105.55);
+		addNewPallet("Fuel suply System", 185.0);
+		addNewPallet("Suspension", 200.4);
+		addNewPallet("Transmission System", 440.70);
 		
 		System.out.println("Pallets added");
 		System.out.println("------------------------------------------------");
 		
-		stmt = conn.prepareStatement("SELECT * FROM pallet");
+		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM pallet");
 		
 		ResultSet rS = stmt.executeQuery();
 		
@@ -155,7 +136,7 @@ public class DAO implements DAOInterface
 	}
 
 	@Override
-	public void addCar(Car car) {
+	public int addCarRecord(Car car) {
 		
 		try {
 			
@@ -171,6 +152,8 @@ public class DAO implements DAOInterface
 			stmt.executeUpdate();
 			
 			stmt.close();
+			
+			return findCarIDByVIN(car.getVIN());
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -178,6 +161,8 @@ public class DAO implements DAOInterface
 		}
 		
 		printAllCars();
+		
+		return -1;
 	}
 
 	private void printAllCars() 
@@ -192,7 +177,6 @@ public class DAO implements DAOInterface
 				
 				System.out.println(rS.getInt(1) + " #  " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
 				
-				
 			}
 			
 			System.out.println("---------------------------");
@@ -201,8 +185,113 @@ public class DAO implements DAOInterface
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public int findPalletForPart(Part part)
+	{
+		try {
+
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM pallet WHERE partType = ?");
+
+			stmt.setString(1, part.getType());
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			int palletID = 0;
+			double currentWeight = 0;
+			double maxDifference = -1;
+			
+			while (rS.next()) { 
+				
+				if (rS.getDouble(4) - rS.getDouble(3) > maxDifference) {
+					
+					palletID = rS.getInt(1);
+					currentWeight = rS.getDouble(3);
+					maxDifference = rS.getDouble(4) - currentWeight;
+					
+				}
+			}
+			
+			stmt.close(); rS.close();
+			
+			if (maxDifference > part.getWeight()) { 
+				
+				updatePalletWithID(palletID, currentWeight + part.getWeight()); 
+				
+				return palletID;
+				
+			} else {
+				
+				addNewPallet(part.getType(), Math.min(1200, part.getWeight() * 4));
+			
+				return findPalletIDByPartType(part.getType());
+			}
 		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	@Override
+	public void addPartRecord(Part part, int carID, int palletID) 
+	{
+		//
+	}
+
+	private void addNewPallet(String type, double maximumWeight) throws SQLException 
+	{
+		PreparedStatement stmt = conn.prepareStatement("INSERT INTO pallet (partType, currentWeight, maximumWeight) VALUES (?, 0, ?)"); 
 		
+		stmt.setString(1, type);
+		stmt.setDouble(2, maximumWeight);
+		
+		stmt.executeUpdate();
+		
+		stmt.close();
+	}
+
+	private void updatePalletWithID(int palletID, double d) throws SQLException 
+	{
+		PreparedStatement stmt = conn.prepareStatement("UPDATE pallet SET currentWeight = ? WHERE palletID = ?");
+		
+		stmt.setDouble(1, d);
+		stmt.setInt(2, palletID);
+		
+		stmt.executeUpdate();
+		
+		stmt.close();
+	}
+	
+	private int findCarIDByVIN(String VIN) throws SQLException
+	{
+		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM cars WHERE VIN = ?");
+		
+		stmt.setString(1, VIN);
+		
+		ResultSet rS = stmt.executeQuery();
+		
+		int index = -1;
+		
+		while (rS.next()) { index = rS.getInt(1); }
+		
+		return index;
+	}
+
+	private int findPalletIDByPartType(String partType) throws SQLException
+	{
+		PreparedStatement stmt = conn.prepareStatement("SELECT max(palletID) FROM pallet WHERE partType = ?");
+		
+		stmt.setString(1, partType);
+		
+		ResultSet rS = stmt.executeQuery();
+		
+		int index = -1;
+		
+		while (rS.next()) { index = rS.getInt(1); }
+		
+		return index;
 	}
 
 }

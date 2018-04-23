@@ -33,10 +33,6 @@ public class LocalServerMain extends UnicastRemoteObject implements LocalServerI
 	{
 		boolean b = server.registerCar(car);
 		
-		ArrayList<Part> parts = car.disassemble();
-		
-		
-		
 		return b;
 	}
 }
