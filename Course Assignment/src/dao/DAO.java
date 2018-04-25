@@ -312,5 +312,9 @@ public class DAO implements DAOInterface
 		
 		return index;
 	}
-
+	
+	
+	private String kurwa() {
+		return "your mom";
+	}
 }
