@@ -153,7 +153,7 @@ public class DAO implements DAOInterface
 			
 			stmt.close();
 			
-			return findCarIDByVIN(car.getVIN());
+			return keyLookupCarByVIN(car.getVIN());
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -224,7 +224,7 @@ public class DAO implements DAOInterface
 				
 				addNewPallet(part.getType(), Math.min(1200, part.getWeight() * 4));
 			
-				return findPalletIDByPartType(part.getType());
+				return keyLookupPalletByPartType(part.getType());
 			}
 		
 		} catch (SQLException e) {
@@ -264,7 +264,7 @@ public class DAO implements DAOInterface
 		stmt.close();
 	}
 	
-	private int findCarIDByVIN(String VIN) throws SQLException
+	private int keyLookupCarByVIN(String VIN) throws SQLException
 	{
 		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM cars WHERE VIN = ?");
 		
@@ -279,7 +279,7 @@ public class DAO implements DAOInterface
 		return index;
 	}
 
-	private int findPalletIDByPartType(String partType) throws SQLException
+	private int keyLookupPalletByPartType(String partType) throws SQLException
 	{
 		PreparedStatement stmt = conn.prepareStatement("SELECT max(palletID) FROM pallet WHERE partType = ?");
 		
