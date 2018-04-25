@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Part implements Serializable
 {
 	private double weight;
-	private String carVIN;
+	private int carID;
 	private String type;
 	
-	public Part (String type,String carVIN, double weight) {
+	public Part (String type,int carID, double weight) {
 		this.weight = weight;
-		this.carVIN = carVIN;
+		this.carID = carID;
 		this.type = type;
 	}
 
@@ -22,12 +22,8 @@ public class Part implements Serializable
 		this.weight = weight;
 	}
 
-	public String getCarVIN() {
-		return carVIN;
-	}
-
-	public void setCarVIN(String carVIN) {
-		this.carVIN = carVIN;
+	public int getCarVIN() {
+		return carID;
 	}
 
 	public String getType() {

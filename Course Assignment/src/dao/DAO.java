@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import models.Car;
 import models.Part;
@@ -55,7 +56,8 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("DROP TABLE IF EXISTS pick CASCADE");
 				
 				
-				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, weight decimal NOT NULL CHECK(weight > 0)," + 
+				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, " +
+						 			"weight decimal NOT NULL CHECK(weight > 0)," + 
 									"part_type varchar NOT NULL," + 
 									"pallet_id int NOT NULL," + 
 									"car_id int NOT NULL)");
@@ -344,6 +346,29 @@ public class DAO implements DAOInterface
 		while (rS.next()) { index = rS.getInt(1); }
 		
 		return index;
+	}
+	
+	private void trackPartsByVin(String VIN) throws SQLException{
+		ArrayList<Part> parts = new ArrayList<Part>(); // List of the parts that came from the car
+		
+		PreparedStatement stmt = conn.prepareStatement //Find the parts that came from the car
+				("SELECT * FROM part p "
+				+ "JOIN car c" 
+				+"ON (p.car_id = c.carID"
+				+ "WHERE c.VIN = ?");
+		stmt.setString(1, VIN);
+		
+		ResultSet rs = stmt.executeQuery();
+		
+		while(rs.next()) { // Add all the parts to the arrayList
+			Part temp = new Part(rs.getString("part_type")
+								, rs.getInt("car_id") 
+								, rs.getDouble("weight"));
+			
+			parts.add(temp);
+		}
+		
+		
 	}
 
 	
