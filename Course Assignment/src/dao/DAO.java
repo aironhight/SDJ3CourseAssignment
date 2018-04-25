@@ -362,7 +362,7 @@ public class DAO implements DAOInterface
 		
 		while(rs.next()) { // Add all the parts to the arrayList
 			Part temp = new Part(rs.getString("part_type")
-								, rs.getInt("car_id") 
+								, rs.getString("car_id") 
 								, rs.getDouble("weight"));
 			
 			parts.add(temp);
