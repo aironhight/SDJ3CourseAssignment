@@ -89,7 +89,8 @@ public class DAO implements DAOInterface
 				stmt = conn.prepareStatement("CREATE TABLE orders("
 									+ "orderID serial PRIMARY KEY," 
 									+ "receiver_address varchar NOT NULL,"
-									+ "receiver_country varchar NOT NULL)");
+									+ "receiver_country varchar NOT NULL"
+									+ "receiver_name varchar NOT NULL)");
 				
 				stmt.executeUpdate();
 				
@@ -128,26 +129,11 @@ public class DAO implements DAOInterface
 		addNewPallet("windows", 125.145);
 		addNewPallet("battery", 200.0);
 		addNewPallet("brakes", 98.756);
-		addNewPallet("oil System", 105.55);
-		addNewPallet("cooling System", 105.55);
-		addNewPallet("fuel System", 185.0);
+		addNewPallet("oil system", 105.55);
+		addNewPallet("cooling system", 105.55);
+		addNewPallet("fuel system", 185.0);
 		addNewPallet("suspension", 200.4);
 		addNewPallet("transmission", 440.70);
-		
-		System.out.println("Pallets added");
-		System.out.println("------------------------------------------------");
-		
-		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM pallet");
-		
-		ResultSet rS = stmt.executeQuery();
-		
-		while (rS.next()) {
-			
-			System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getDouble(3) + " " + rS.getDouble(4));
-			
-		}
-		
-		stmt.close();
 	}
 
 	@Override
