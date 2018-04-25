@@ -49,7 +49,6 @@ public class TrackingServer extends UnicastRemoteObject implements GlobalServer 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 
 	@Override

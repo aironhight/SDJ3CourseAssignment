@@ -51,6 +51,9 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("DROP TABLE IF EXISTS car CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS pallet CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS part");
+				stm.executeUpdate("DROP TABLE IF EXISTS order CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS pick CASCADE");
+				
 				
 				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, weight decimal NOT NULL CHECK(weight > 0)," + 
 									"part_type varchar NOT NULL," + 
@@ -75,6 +78,20 @@ public class DAO implements DAOInterface
 				
 				stmt.executeUpdate();
 				
+				stmt = conn.prepareStatement("CREATE TABLE pick (" + 
+						 
+						"id serial PRIMARY KEY," + 
+						"part_id int NOT NULL," + 
+						"order_id int NOT NULL)");
+				stmt.executeUpdate();
+				
+				stmt = conn.prepareStatement("CREATE TABLE order(" + 
+						"	id int NOT NULL," + 
+						"	receiver_address varchar NOT NULL" + 
+						"	receiver_country NOT NULL)");
+				stmt.executeUpdate();
+							
+				
 				System.out.println("TABLES CREATED SUCCESFULLY");
 
 				stmt.close();
@@ -82,6 +99,10 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("alter table part add foreign key (car_id) references car (carID) on delete restrict on update restrict");
 	
 				stm.executeUpdate("alter table part add foreign key (pallet_id) references pallet (palletID) on delete restrict on update restrict");
+				
+				stm.executeUpdate("alter table pick add foreign key (order_id) references order(id) on delete restricton update restrict");
+				
+				stm.executeUpdate("alter table order add foreign key(pick_id)references pick(id)on delete restricton update restrict");
 				
 				stm.close();
 
@@ -105,12 +126,12 @@ public class DAO implements DAOInterface
 		addNewPallet("Doors", 425.50);
 		addNewPallet("Windows", 125.145);
 		addNewPallet("Battery", 200.0);
-		addNewPallet("Breakes", 98.756);
+		addNewPallet("Brakes", 98.756);
 		addNewPallet("Oil System", 105.55);
 		addNewPallet("Cooling System", 105.55);
-		addNewPallet("Fuel suply System", 185.0);
+		addNewPallet("Fuel System", 185.0);
 		addNewPallet("Suspension", 200.4);
-		addNewPallet("Transmission System", 440.70);
+		addNewPallet("Transmission", 440.70);
 		
 		System.out.println("Pallets added");
 		System.out.println("------------------------------------------------");
@@ -326,9 +347,7 @@ public class DAO implements DAOInterface
 		
 		return index;
 	}
+
 	
 	
-	private String kurwa() {
-		return "your mom";
-	}
 }
