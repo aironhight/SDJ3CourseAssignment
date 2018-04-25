@@ -8,13 +8,14 @@ public class Pallet {
 	private double maxWeight;
 	private String id;
 	private ArrayList<Part> parts;
+	private double currentWeight;
 	
 	public Pallet(String partType, double maxWeight, String id, ArrayList<Part> parts) {
-		super();
 		this.partType = partType;
 		this.maxWeight = maxWeight;
 		this.id = id;
 		this.parts = parts;
+		currentWeight = getPartsWeight(parts);
 	}
 	
 	public String getPartType() {
@@ -33,11 +34,15 @@ public class Pallet {
 		return parts.size();
 	}
 	
+	public double getCurrentWeight() {
+		return currentWeight;
+	}
+	
 	private double getPartsWeight(ArrayList<Part> partsList) {
 		double weight = 0;
 		
 		for(int i=0; i<partsList.size(); i++) {
-			weight += partsList.get(0).getWeight();
+			weight += partsList.get(i).getWeight();
 		}
 		
 		return weight;
@@ -68,6 +73,7 @@ public class Pallet {
 		}
 		
 		if(parts.addAll(partsList)) {
+			currentWeight += partsWeight;
 			return partsList;
 		} else {
 			return null;
