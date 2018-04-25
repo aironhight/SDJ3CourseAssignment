@@ -52,15 +52,14 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("DROP TABLE IF EXISTS car CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS pallet CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS part");
-				stm.executeUpdate("DROP TABLE IF EXISTS order CASCADE");
-				stm.executeUpdate("DROP TABLE IF EXISTS pick CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS orders CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS pick");
 				
-				
-				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, " +
+				stm.executeUpdate("CREATE TABLE part (partID serial PRIMARY KEY, " +
 						 			"weight decimal NOT NULL CHECK(weight > 0)," + 
-									"part_type varchar NOT NULL," + 
-									"pallet_id int NOT NULL," + 
-									"car_id int NOT NULL)");
+									"partType varchar NOT NULL," + 
+									"palletID int NOT NULL," + 
+									"carID int NOT NULL)");
 				
 				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
 									+ "carID serial PRIMARY KEY, "
@@ -73,39 +72,39 @@ public class DAO implements DAOInterface
 				stmt.executeUpdate();
 				
 				stmt = conn.prepareStatement("CREATE TABLE pallet ("
-						+ "palletID serial PRIMARY KEY,"
-						+ "partType varchar(30) not null,"
-						+ "currentWeight real not null,"
-						+ "maximumWeight real not null)");
+									+ "palletID serial PRIMARY KEY,"
+									+ "partType varchar(30) not null,"
+									+ "currentWeight real not null,"
+									+ "maximumWeight real not null)");
 				
 				stmt.executeUpdate();
 				
-				stmt = conn.prepareStatement("CREATE TABLE pick (" + 
-						 
-						"id serial PRIMARY KEY," + 
-						"part_id int NOT NULL," + 
-						"order_id int NOT NULL)");
+				stmt = conn.prepareStatement("CREATE TABLE pick(" 
+									+ "pickID serial PRIMARY KEY," 
+									+ "partID int NOT NULL," 
+									+ "orderID int NOT NULL)");
+				
 				stmt.executeUpdate();
 				
-				stmt = conn.prepareStatement("CREATE TABLE order(" + 
-						"	id int NOT NULL," + 
-						"	receiver_address varchar NOT NULL" + 
-						"	receiver_country NOT NULL)");
+				stmt = conn.prepareStatement("CREATE TABLE orders("
+									+ "orderID serial PRIMARY KEY," 
+									+ "receiver_address varchar NOT NULL,"
+									+ "receiver_country varchar NOT NULL)");
+				
 				stmt.executeUpdate();
-							
 				
 				System.out.println("TABLES CREATED SUCCESFULLY");
 
 				stmt.close();
 
-				stm.executeUpdate("alter table part add foreign key (car_id) references car (carID) on delete restrict on update restrict");
+				stm.executeUpdate("alter table part add foreign key (carID) references car (carID) on delete restrict on update restrict");
 	
-				stm.executeUpdate("alter table part add foreign key (pallet_id) references pallet (palletID) on delete restrict on update restrict");
+				stm.executeUpdate("alter table part add foreign key (palletID) references pallet (palletID) on delete restrict on update restrict");
 				
-				stm.executeUpdate("alter table pick add foreign key (order_id) references order(id) on delete restricton update restrict");
+				stm.executeUpdate("alter table pick add foreign key (orderID) references orders (orderID) on delete restrict on update restrict");
 				
-				stm.executeUpdate("alter table order add foreign key(pick_id)references pick(id)on delete restricton update restrict");
-				
+				stm.executeUpdate("alter table pick add foreign key (partID) references part (partID) on delete restrict on update restrict");
+				 
 				stm.close();
 
 				addPalletsType();
@@ -124,16 +123,16 @@ public class DAO implements DAOInterface
 	
 	private void addPalletsType() throws SQLException 
 	{
-		addNewPallet("Engine", 1025.45);
-		addNewPallet("Doors", 425.50);
-		addNewPallet("Windows", 125.145);
-		addNewPallet("Battery", 200.0);
-		addNewPallet("Brakes", 98.756);
-		addNewPallet("Oil System", 105.55);
-		addNewPallet("Cooling System", 105.55);
-		addNewPallet("Fuel System", 185.0);
-		addNewPallet("Suspension", 200.4);
-		addNewPallet("Transmission", 440.70);
+		addNewPallet("engine", 1025.45);
+		addNewPallet("doors", 425.50);
+		addNewPallet("windows", 125.145);
+		addNewPallet("battery", 200.0);
+		addNewPallet("brakes", 98.756);
+		addNewPallet("oil System", 105.55);
+		addNewPallet("cooling System", 105.55);
+		addNewPallet("fuel System", 185.0);
+		addNewPallet("suspension", 200.4);
+		addNewPallet("transmission", 440.70);
 		
 		System.out.println("Pallets added");
 		System.out.println("------------------------------------------------");
@@ -250,7 +249,7 @@ public class DAO implements DAOInterface
 				
 			} else {
 				
-				addNewPallet(part.getType(), Math.min(1200, part.getWeight() * 4));
+				addNewPallet(part.getType(), Math.min(2000, Math.max(part.getWeight() * 4, 100)));
 			
 				return keyLookupPalletByPartType(part.getType());
 			}
