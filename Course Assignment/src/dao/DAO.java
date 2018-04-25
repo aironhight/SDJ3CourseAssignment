@@ -39,7 +39,7 @@ public class DAO implements DAOInterface
 	
 	private void buildDDL() 
 	{
-		boolean execute = true;
+		boolean execute = false;
 		
 		if (execute) {
 			
@@ -48,18 +48,22 @@ public class DAO implements DAOInterface
 				Statement stm = conn.createStatement();
 				
 				stm.executeUpdate("CREATE SCHEMA IF NOT EXISTS facility_schema");
-				stm.executeUpdate("DROP TABLE cars");
-				stm.executeUpdate("DROP TABLE pallet");
+				stm.executeUpdate("DROP TABLE IF EXISTS car CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS pallet CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS part");
 				
-				stm.close();
+				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, weight decimal NOT NULL CHECK(weight > 0)," + 
+									"part_type varchar NOT NULL," + 
+									"pallet_id int NOT NULL," + 
+									"car_id int NOT NULL)");
 				
-				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE cars ("
-						+ "carID serial PRIMARY KEY, "
-						+ "make VARCHAR(10) not null, "
-						+ "model VARCHAR(10) not null, "
-						+ "year int not null,"
-						+ "VIN VARCHAR(15) not null,"
-						+ "weight real not null)");
+				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
+									+ "carID serial PRIMARY KEY, "
+									+ "make VARCHAR(10) not null, "
+									+ "model VARCHAR(10) not null, "
+									+ "year int not null,"
+									+ "VIN VARCHAR(15) not null,"
+									+ "weight real not null)");
 				
 				stmt.executeUpdate();
 				
@@ -74,6 +78,12 @@ public class DAO implements DAOInterface
 				System.out.println("TABLES CREATED SUCCESFULLY");
 
 				stmt.close();
+
+				stm.executeUpdate("alter table part add foreign key (car_id) references car (carID) on delete restrict on update restrict");
+	
+				stm.executeUpdate("alter table part add foreign key (pallet_id) references pallet (palletID) on delete restrict on update restrict");
+				
+				stm.close();
 
 				addPalletsType();
 				
@@ -111,28 +121,11 @@ public class DAO implements DAOInterface
 		
 		while (rS.next()) {
 			
-			System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getDouble(3));
+			System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getDouble(3) + " " + rS.getDouble(4));
 			
 		}
 		
 		stmt.close();
-	}
-
-	/* This method deletes all the rows from all the tables */
-	private void deleteEverything()
-	{
-		try {
-			
-			PreparedStatement stmt = conn.prepareStatement("DELETE FROM cars");
-			
-			stmt.executeUpdate();
-			
-			stmt.close();
-		
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -140,7 +133,7 @@ public class DAO implements DAOInterface
 		
 		try {
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO cars (make, model, year, VIN, weight)"
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO car (make, model, year, VIN, weight)"
 														 + " VALUES (?, ?, ?, ?, ?) ");
 			
 			stmt.setString(1, car.getMake());
@@ -150,6 +143,18 @@ public class DAO implements DAOInterface
 			stmt.setDouble(5, car.getWeight());
 			
 			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("CREATE * FROM car");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			System.out.println("-----------------------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3)+ " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
+				
+			}
 			
 			stmt.close();
 			
@@ -169,7 +174,7 @@ public class DAO implements DAOInterface
 	{
 		try {
 			
-			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM cars");
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM car");
 			
 			ResultSet rS = stmt.executeQuery();
 			
@@ -237,7 +242,33 @@ public class DAO implements DAOInterface
 	@Override
 	public void addPartRecord(Part part, int carID, int palletID) 
 	{
-		//
+		try {
+
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, pallet_id, car_id) VALUES (?, ?, ?, ?)");
+			
+			stmt.setDouble(1, part.getWeight());
+			stmt.setString(2, part.getType());
+			stmt.setInt(3, carID);
+			stmt.setInt(4, palletID);
+			
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("SELECT * FROM part");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getDouble(2) + " " + rS.getString(3) + " " + rS.getInt(4) + " " + rS.getInt(5) + " --");
+				
+			}
+			
+			stmt.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void addNewPallet(String type, double maximumWeight) throws SQLException 
@@ -248,6 +279,8 @@ public class DAO implements DAOInterface
 		stmt.setDouble(2, maximumWeight);
 		
 		stmt.executeUpdate();
+		
+		System.out.println("NEW PALLET ADDED");
 		
 		stmt.close();
 	}
@@ -266,7 +299,7 @@ public class DAO implements DAOInterface
 	
 	private int keyLookupCarByVIN(String VIN) throws SQLException
 	{
-		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM cars WHERE VIN = ?");
+		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM car WHERE VIN = ?");
 		
 		stmt.setString(1, VIN);
 		
@@ -293,5 +326,9 @@ public class DAO implements DAOInterface
 		
 		return index;
 	}
-
+	
+	
+	private String kurwa() {
+		return "your mom";
+	}
 }

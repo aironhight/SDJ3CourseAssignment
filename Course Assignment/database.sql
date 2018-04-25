@@ -43,7 +43,8 @@ CREATE TABLE order
 (
 	id int NOT NULL,
 	pick_id varchar NOT NULL
-	receiver varchar NOT NULL
+	receiver_address varchar NOT NULL
+	receiver_country NOT NULL
 )
 ;
 	
@@ -84,6 +85,20 @@ alter table order
 	on update restrict
 ;
 
+/*	findPartsFromACar(inputVIN);
+	select * from parts where vin = inputVIN;
+	
+	--parts list--
+	
+	select * from pick where partId = part(0).getId();
+	
+	--picks list--
+	
+	select * from order where pickId = pick.getId();
+	
+	--list of orders--
+	--job done--
+	*/
 
 	
 
