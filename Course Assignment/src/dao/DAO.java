@@ -39,7 +39,7 @@ public class DAO implements DAOInterface
 	
 	private void buildDDL() 
 	{
-		boolean execute = false;
+		boolean execute = true;
 		
 		if (execute) {
 			
@@ -144,7 +144,7 @@ public class DAO implements DAOInterface
 			
 			stmt.executeUpdate();
 			
-			stmt = conn.prepareStatement("CREATE * FROM car");
+			stmt = conn.prepareStatement("SELECT * FROM car");
 			
 			ResultSet rS = stmt.executeQuery();
 			
@@ -243,8 +243,8 @@ public class DAO implements DAOInterface
 	public void addPartRecord(Part part, int carID, int palletID) 
 	{
 		try {
-
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, pallet_id, car_id) VALUES (?, ?, ?, ?)");
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, car_id, pallet_id) VALUES (?, ?, ?, ?)");
 			
 			stmt.setDouble(1, part.getWeight());
 			stmt.setString(2, part.getType());
@@ -299,17 +299,15 @@ public class DAO implements DAOInterface
 	
 	private int keyLookupCarByVIN(String VIN) throws SQLException
 	{
-		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM car WHERE VIN = ?");
+		PreparedStatement stmt = conn.prepareStatement("SELECT carID FROM car WHERE VIN = ?");
 		
 		stmt.setString(1, VIN);
 		
 		ResultSet rS = stmt.executeQuery();
 		
-		int index = -1;
+		rS.next();
 		
-		while (rS.next()) { index = rS.getInt(1); }
-		
-		return index;
+		return rS == null ? -1 : rS.getInt(1);
 	}
 
 	private int keyLookupPalletByPartType(String partType) throws SQLException
