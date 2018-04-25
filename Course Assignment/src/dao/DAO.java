@@ -58,12 +58,12 @@ public class DAO implements DAOInterface
 									"car_id int NOT NULL)");
 				
 				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
-						+ "carID serial PRIMARY KEY, "
-						+ "make VARCHAR(10) not null, "
-						+ "model VARCHAR(10) not null, "
-						+ "year int not null,"
-						+ "VIN VARCHAR(15) not null,"
-						+ "weight real not null)");
+									+ "carID serial PRIMARY KEY, "
+									+ "make VARCHAR(10) not null, "
+									+ "model VARCHAR(10) not null, "
+									+ "year int not null,"
+									+ "VIN VARCHAR(15) not null,"
+									+ "weight real not null)");
 				
 				stmt.executeUpdate();
 				
@@ -143,6 +143,18 @@ public class DAO implements DAOInterface
 			stmt.setDouble(5, car.getWeight());
 			
 			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("CREATE * FROM car");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			System.out.println("-----------------------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3)+ " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
+				
+			}
 			
 			stmt.close();
 			
@@ -267,6 +279,8 @@ public class DAO implements DAOInterface
 		stmt.setDouble(2, maximumWeight);
 		
 		stmt.executeUpdate();
+		
+		System.out.println("NEW PALLET ADDED");
 		
 		stmt.close();
 	}
