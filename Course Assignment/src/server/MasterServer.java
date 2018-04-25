@@ -35,6 +35,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			MasterServer server = new MasterServer(1099);
 
 			Naming.rebind ("MServer", server);
+			
 
 			System.out.println ("Master server online..");
 		}
