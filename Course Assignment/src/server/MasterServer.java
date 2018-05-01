@@ -29,7 +29,6 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 
 	public static void main ( String args[] ) throws Exception
     {
-
 		try 
 		{
 			MasterServer server = new MasterServer(1099);

@@ -40,7 +40,7 @@ public class DAO implements DAOInterface
 	
 	private void buildDDL() 
 	{
-		boolean execute = true;
+		boolean execute = false;
 		
 		if (execute) {
 			
@@ -64,10 +64,11 @@ public class DAO implements DAOInterface
 
 				stm.executeUpdate("CREATE TABLE orderParts ("
 								+ "OrderPartID serial PRIMARY KEY,"
-								+ "PartName varchar not null,"
+								+ "PartType varchar not null,"
 								+ "CarMake varchar not null,"
 								+ "CarModel varchar not null,"
 								+ "CarYear int not null,"
+								+ "Quantity int not null,"
 								+ "OrderID int not null)");
 				
 				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
@@ -363,6 +364,89 @@ public class DAO implements DAOInterface
 								, rs.getDouble("weight"));
 			
 			parts.add(temp);
+		}
+	}
+
+	public int addOrderFromReceiver(String receiverName, String receiverAddress, String receiverCountry) 
+	{
+
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO orders (receiver_name, receiver_address, receiver_country, dispatched)"
+															+ "VALUES(?, ?, ?, ?)");
+			
+			stmt.setString(1, receiverName);
+			stmt.setString(2, receiverAddress);
+			stmt.setString(3,  receiverCountry);
+			stmt.setBoolean(4, false);
+			
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("SELECT max(orderID) FROM orders");
+			
+			ResultSet rS = stmt.executeQuery(); rS.next();
+			
+			int orderID = rS.getInt(1);
+			
+			stmt = conn.prepareStatement("SELECT * FROM orders");
+			
+			rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " # " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getString(4) + " " + rS.getBoolean(5));
+				
+			}
+			
+			stmt.close();
+			
+			return orderID;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+
+	public void insertInOrderPart(String partType, String carMake, String carModel, int carYear, int quantity, int orderID) 
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO orderParts (partType, carMake, carModel, carYear, quantity, orderId) "
+															+ "VALUES (?, ?, ?, ?, ?, ?)");
+			
+			stmt.setString(1, partType);
+			stmt.setString(2, carMake);
+			stmt.setString(3, carModel);
+			stmt.setInt(4, carYear);
+			stmt.setInt(5, quantity);
+			stmt.setInt(6, orderID);
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void delete()
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM orderParts");
+			
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("DELETE FROM orders");
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

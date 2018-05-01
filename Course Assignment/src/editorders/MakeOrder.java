@@ -11,20 +11,22 @@ public class MakeOrder
 		DAO dao = new DAO();
 		Scanner in = new Scanner(System.in);
 		
+		dao.delete();
+		
 		while (true) {
 			
 			System.out.println("-- INSERT A NEW ORDER --");
 			
-			String partName, carMake, carModel;
+			String receiverName, receiverAddress, receiverCountry;
+			
+			System.out.println("Receiver name :"); receiverName = in.nextLine();
+			System.out.println("Receiver address :"); receiverAddress = in.nextLine();
+			System.out.println("Receiver country :"); receiverCountry = in.nextLine();
+			
+			int orderID = dao.addOrderFromReceiver(receiverName, receiverAddress, receiverCountry);
+
+			String partType, carMake, carModel;
 			int carYear, quantity;
-			
-			String companyName, companyAddress, companyCountry;
-			
-			System.out.println("Company name :"); companyName = in.nextLine();
-			System.out.println("Company address :"); companyAddress = in.nextLine();
-			System.out.println("Company country :"); companyCountry = in.nextLine();
-			
-			//dao.addOrder();
 			
 			while (true) {
 				
@@ -34,7 +36,7 @@ public class MakeOrder
 				
 				if (!chose.toLowerCase().equals("yes")) break;
 				
-				System.out.println("Part Name :"); partName = in.nextLine();
+				System.out.println("Part Type :"); partType = in.nextLine();
 				
 				System.out.println("Car Make :"); carMake = in.nextLine();
 				
@@ -44,7 +46,7 @@ public class MakeOrder
 				
 				System.out.println("Quantity :"); quantity = Integer.parseInt(in.nextLine());
 				
-				//dao.insertInOrderPart
+				dao.insertInOrderPart(partType, carMake, carModel, carYear, quantity, orderID);
 			}
 			
 		}
