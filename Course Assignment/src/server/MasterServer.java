@@ -87,7 +87,6 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 					
 			dao.addPartRecord(parts.get(i), carID, palletID);
 		}
-		
 	}
 
 }

@@ -51,15 +51,24 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("CREATE SCHEMA IF NOT EXISTS facility_schema");
 				stm.executeUpdate("DROP TABLE IF EXISTS car CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS pallet CASCADE");
-				stm.executeUpdate("DROP TABLE IF EXISTS part");
+				stm.executeUpdate("DROP TABLE IF EXISTS part CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS orders CASCADE");
-				stm.executeUpdate("DROP TABLE IF EXISTS pick");
+				stm.executeUpdate("DROP TABLE IF EXISTS pick CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS orderParts CASCADE");
 				
 				stm.executeUpdate("CREATE TABLE part (partID serial PRIMARY KEY, " +
 						 			"weight decimal NOT NULL CHECK(weight > 0)," + 
 									"partType varchar NOT NULL," + 
 									"palletID int NOT NULL," + 
 									"carID int NOT NULL)");
+
+				stm.executeUpdate("CREATE TABLE orderParts ("
+								+ "OrderPartID serial PRIMARY KEY,"
+								+ "PartName varchar not null,"
+								+ "CarMake varchar not null,"
+								+ "CarModel varchar not null,"
+								+ "CarYear int not null,"
+								+ "OrderID int not null)");
 				
 				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
 									+ "carID serial PRIMARY KEY, "
@@ -89,8 +98,9 @@ public class DAO implements DAOInterface
 				stmt = conn.prepareStatement("CREATE TABLE orders("
 									+ "orderID serial PRIMARY KEY," 
 									+ "receiver_address varchar NOT NULL,"
-									+ "receiver_country varchar NOT NULL"
-									+ "receiver_name varchar NOT NULL)");
+									+ "receiver_country varchar NOT NULL,"
+									+ "receiver_name varchar NOT NULL,"
+									+ "dispatched boolean NOT NULL)");
 				
 				stmt.executeUpdate();
 				
@@ -105,7 +115,9 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("alter table pick add foreign key (orderID) references orders (orderID) on delete restrict on update restrict");
 				
 				stm.executeUpdate("alter table pick add foreign key (partID) references part (partID) on delete restrict on update restrict");
-				 
+
+				stm.executeUpdate("alter table orderParts add foreign key (OrderID) references orders (orderID) on delete restrict on update restrict");
+				
 				stm.close();
 
 				addPalletsType();
@@ -352,10 +364,6 @@ public class DAO implements DAOInterface
 			
 			parts.add(temp);
 		}
-		
-		
 	}
-
-	
 	
 }
