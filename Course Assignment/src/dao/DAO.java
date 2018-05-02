@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import models.Car;
 import models.Part;
+import models.PartDestination;
 import models.Pick;
 
 public class DAO implements DAOInterface
@@ -370,7 +371,7 @@ public class DAO implements DAOInterface
 		
 		/* AT THIS POINT WE HAVE ALL THE PART ID's THAT WE ARE TRYING TO TRACK */
 		
-		ArrayList<Integer> orderIdList = new ArrayList<Integer>(); // list of order id's that we will get from the next query
+		ArrayList<Pick> pickList = new ArrayList<Pick>(); // list of picks that we will get from the next query
 		//get the pick of each part.
 		for(int i=0; i<partIdList.size(); i++) {
 			stmt = conn.prepareStatement
@@ -378,17 +379,23 @@ public class DAO implements DAOInterface
 			rs = stmt.executeQuery();
 			
 			while(rs.next()) {
-				orderIdList.add(rs.getInt("orderID")); //add the ID's to the list
+				pickList.add(new Pick(rs.getInt("pickID"), rs.getInt("partID"), rs.getInt("orderID"))); //add the picks to the picklist
 			}
 		}
 		
-		/* AT THIS POINT WE HAVE ALL THE ORDER ID's THAT CONTAIN THE PARTS THAT WE TRACK */
-		if(orderIdList.size() == 0) {
+		/* AT THIS POINT WE HAVE ALL THE PICK ID's THAT CONTAIN THE PARTS THAT WE TRACK */
+		if(pickList.size() == 0) {
 			System.out.println("The pick id list is empty *LINE 388 DAO.java*");
 			return;
 		}
 		
-		
+		//Now we need to make objects of PartDestination containing info about the part type and where it went to.
+		ArrayList<PartDestination> partDestinations = new ArrayList<PartDestination>(pickList.size());
+		for(int i=0; i<pickList.size(); i++) {
+			stmt = conn.prepareStatement("SELECT part_type FROM part p WHERE p.partID = ? join orders o on ");
+			
+			
+		}		
 	}
 
 	public int addOrderFromReceiver(String receiverName, String receiverAddress, String receiverCountry) 
@@ -472,6 +479,12 @@ public class DAO implements DAOInterface
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public ArrayList<Part> findAllPartsFromCar(int carID) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
