@@ -386,7 +386,7 @@ public class DAO implements DAOInterface
 		/* AT THIS POINT WE HAVE ALL THE PICK ID's THAT CONTAIN THE PARTS THAT WE TRACK */
 		if(pickList.size() == 0) {
 			System.out.println("The pick id list is empty *LINE 388 DAO.java*");
-			return;
+			return; // test
 		}
 		
 		//Now we need to make objects of PartDestination containing info about the part type and where it went to.
