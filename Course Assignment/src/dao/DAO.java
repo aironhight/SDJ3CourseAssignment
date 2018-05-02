@@ -483,7 +483,24 @@ public class DAO implements DAOInterface
 
 	public ArrayList<Part> findAllPartsFromCar(int carID) 
 	{
-		
+		try {
+			
+			ArrayList<Part> parts = new ArrayList<>();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM part");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				parts.add(new Part(rS.getString(2)));
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return null;
 		
