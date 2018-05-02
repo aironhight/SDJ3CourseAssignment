@@ -3,15 +3,16 @@ package editorders;
 import java.util.Scanner;
 
 import dao.DAO;
+import dao.DAOInterface;
+import models.Order;
+import models.OrderPart;
 
 public class MakeOrder 
 {
 	public static void main(String[] args)
 	{
-		DAO dao = new DAO();
+		DAOInterface dao = new DAO();
 		Scanner in = new Scanner(System.in);
-		
-		dao.delete();
 		
 		while (true) {
 			
@@ -23,7 +24,7 @@ public class MakeOrder
 			System.out.println("Receiver address :"); receiverAddress = in.nextLine();
 			System.out.println("Receiver country :"); receiverCountry = in.nextLine();
 			
-			int orderID = dao.addOrderFromReceiver(receiverName, receiverAddress, receiverCountry);
+			int orderID = dao.addOrderFromReceiver(new Order(receiverAddress, receiverCountry, receiverName));
 
 			String partType, carMake, carModel;
 			int carYear, quantity;
@@ -44,9 +45,7 @@ public class MakeOrder
 				
 				System.out.println("Car Year :"); carYear = Integer.parseInt(in.nextLine());
 				
-				System.out.println("Quantity :"); quantity = Integer.parseInt(in.nextLine());
-				
-				dao.insertInOrderPart(partType, carMake, carModel, carYear, quantity, orderID);
+				dao.insertInOrderPart(new OrderPart(partType, carMake, carModel, carYear, orderID));
 			}
 			
 		}
