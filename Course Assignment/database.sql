@@ -93,7 +93,7 @@ alter table order
 	
 	--picks list--
 	
-	select * from order where pickId = pick.getId();
+	select * from order where pickId = pick.getId();  join
 	
 	--list of orders--
 	--job done--

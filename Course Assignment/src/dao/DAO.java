@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import models.Car;
 import models.Part;
+import models.Pick;
 
 public class DAO implements DAOInterface
 {
@@ -347,24 +348,47 @@ public class DAO implements DAOInterface
 	}
 	
 	private void trackPartsByVin(String VIN) throws SQLException{
-		ArrayList<Part> parts = new ArrayList<Part>(); // List of the parts that came from the car
+		ArrayList<Integer> partIdList = new ArrayList<Integer>(); // List of the parts that came from the car
 		
 		PreparedStatement stmt = conn.prepareStatement //Find the parts that came from the car
-				("SELECT * FROM part p "
+				("SELECT partID FROM part p "
 				+ "JOIN car c" 
 				+"ON (p.car_id = c.carID"
 				+ "WHERE c.VIN = ?");
 		stmt.setString(1, VIN);
 		
-		ResultSet rs = stmt.executeQuery();
+		ResultSet rs = stmt.executeQuery(); // get all the ID's of parts which come from the specified car
 		
 		while(rs.next()) { // Add all the parts to the arrayList
-			Part temp = new Part(rs.getString("part_type")
-								, rs.getString("car_id") 
-								, rs.getDouble("weight"));
-			
-			parts.add(temp);
+			partIdList.add(rs.getInt("partID"));
 		}
+		
+		if(partIdList.size() == 0) {
+			System.out.println("The list of parts is empty *LINE 365 DAO.java*"); // Debugging purpose
+			return;
+		}
+		
+		/* AT THIS POINT WE HAVE ALL THE PART ID's THAT WE ARE TRYING TO TRACK */
+		
+		ArrayList<Integer> orderIdList = new ArrayList<Integer>(); // list of order id's that we will get from the next query
+		//get the pick of each part.
+		for(int i=0; i<partIdList.size(); i++) {
+			stmt = conn.prepareStatement
+					("SELECT * FROM pick WHERE partId = " + partIdList.get(i));
+			rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				orderIdList.add(rs.getInt("orderID")); //add the ID's to the list
+			}
+		}
+		
+		/* AT THIS POINT WE HAVE ALL THE ORDER ID's THAT CONTAIN THE PARTS THAT WE TRACK */
+		if(orderIdList.size() == 0) {
+			System.out.println("The pick id list is empty *LINE 388 DAO.java*");
+			return;
+		}
+		
+		
 	}
 
 	public int addOrderFromReceiver(String receiverName, String receiverAddress, String receiverCountry) 
