@@ -4,13 +4,13 @@ public class PartDestination {
 	private String partType;
 	private String receiverName;
 	private String receiverAddress;
-	private String receiverCity;
+	private String receiverCountry;
 	
 	public PartDestination(String partType, String receiverName, String receiverAddress, String receiverCity) {
 		this.partType = partType;
 		this.receiverName = receiverName;
 		this.receiverAddress = receiverAddress;
-		this.receiverCity = receiverCity;
+		this.receiverCountry = receiverCity;
 	}
 
 	public String getPartType() {
@@ -25,7 +25,7 @@ public class PartDestination {
 		return receiverAddress;
 	}
 
-	public String getReceiverCity() {
-		return receiverCity;
+	public String getReceiverCountry() {
+		return receiverCountry;
 	}
 }

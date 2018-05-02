@@ -8,6 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import models.Car;
 import models.Part;
 import models.PartDestination;
@@ -348,13 +352,13 @@ public class DAO implements DAOInterface
 		return index;
 	}
 	
-	private void trackPartsByVin(String VIN) throws SQLException{
+	private JSONObject trackPartsByVin(String VIN) throws SQLException, JSONException{
 		ArrayList<Integer> partIdList = new ArrayList<Integer>(); // List of the parts that came from the car
 		
 		PreparedStatement stmt = conn.prepareStatement //Find the parts that came from the car
 				("SELECT partID FROM part p "
 				+ "JOIN car c" 
-				+"ON (p.car_id = c.carID"
+				+"ON (p.car_id = c.carID)"
 				+ "WHERE c.VIN = ?");
 		stmt.setString(1, VIN);
 		
@@ -366,7 +370,7 @@ public class DAO implements DAOInterface
 		
 		if(partIdList.size() == 0) {
 			System.out.println("The list of parts is empty *LINE 365 DAO.java*"); // Debugging purpose
-			return;
+			return null;
 		}
 		
 		/* AT THIS POINT WE HAVE ALL THE PART ID's THAT WE ARE TRYING TO TRACK */
@@ -375,7 +379,7 @@ public class DAO implements DAOInterface
 		//get the pick of each part.
 		for(int i=0; i<partIdList.size(); i++) {
 			stmt = conn.prepareStatement
-					("SELECT * FROM pick WHERE partId = " + partIdList.get(i));
+					("SELECT * FROM pick WHERE partId = " + partIdList.get(i) + "ORDER BY partId");
 			rs = stmt.executeQuery();
 			
 			while(rs.next()) {
@@ -386,16 +390,48 @@ public class DAO implements DAOInterface
 		/* AT THIS POINT WE HAVE ALL THE PICK ID's THAT CONTAIN THE PARTS THAT WE TRACK */
 		if(pickList.size() == 0) {
 			System.out.println("The pick id list is empty *LINE 388 DAO.java*");
-			return; // test
+			return null;
 		}
 		
 		//Now we need to make objects of PartDestination containing info about the part type and where it went to.
 		ArrayList<PartDestination> partDestinations = new ArrayList<PartDestination>(pickList.size());
-		for(int i=0; i<pickList.size(); i++) {
-			stmt = conn.prepareStatement("SELECT part_type FROM part p WHERE p.partID = ? join orders o on ");
+		
+		
+		
+		for(int i=0; i<pickList.size(); i++) {			
+			stmt = conn.prepareStatement("SELECT pa.part_type, o.receiver_name, o.receiver_address, o.receiver_country"
+					+ "FROM pick p "
+					+ "JOIN part pa ON (p.partID = pa.partID) "
+					+ "JOIN orders o ON (p.orderID = o.orderID)"
+					+ "WHERE (p.partID = ?) and (p.orderID = ?)");
 			
+			stmt.setInt(1, pickList.get(i).getPartId()); 
+			stmt.setInt(2, pickList.get(i).getOrderId());
 			
-		}		
+			rs = stmt.executeQuery();
+			//and them to the list
+			while(rs.next()) {
+				partDestinations.add(new PartDestination(rs.getString("part_type"), rs.getString("receiver_name")
+						, rs.getString("receiver_address"), rs.getString("receiver_country")));
+			}
+		}
+		JSONObject jResult = new JSONObject();
+		JSONArray jArray = new JSONArray();
+		for(int i=0; i<partDestinations.size(); i++) {
+			JSONObject jGroup = new JSONObject();
+			jGroup.put("part_type", partDestinations.get(i).getPartType());
+			jGroup.put("receiver_name", partDestinations.get(i).getReceiverName());
+			jGroup.put("receiver_address", partDestinations.get(i).getReceiverAddress());
+			jGroup.put("receiver_country", partDestinations.get(i).getReceiverCountry());
+			
+			JSONObject jOuter = new JSONObject();
+			jOuter.put("part_info", jGroup);
+			
+			jArray.put(jOuter);
+		}
+		jResult.put("result", jArray);
+		
+		return jResult;
 	}
 
 	public int addOrderFromReceiver(String receiverName, String receiverAddress, String receiverCountry) 
