@@ -456,6 +456,7 @@ public class DAO implements DAOInterface
 			
 			int orderID = rS.getInt(1);
 			
+			//asd
 			stmt = conn.prepareStatement("SELECT * FROM orders");
 			
 			rS = stmt.executeQuery();
