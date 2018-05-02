@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.Car;
+import models.OrderPart;
 import models.Part;
 import models.PartDestination;
 import models.Pick;
@@ -481,21 +482,26 @@ public class DAO implements DAOInterface
 		}
 	}
 
-	public ArrayList<Part> findAllPartsFromCar(int carID) 
+	public ArrayList<Part> findAllPartsFromCar(int carID, String carVIN) 
 	{
 		try {
 			
 			ArrayList<Part> parts = new ArrayList<>();
 			
-			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM part");
+			PreparedStatement stmt = conn.prepareStatement ("SELECT * FROM part p "
+							+ "JOIN car c " 
+							+ "ON (p.car_id = c.carID) "
+							+ "WHERE c.VIN = ? AND p.dispatched = false");
 			
 			ResultSet rS = stmt.executeQuery();
 			
 			while (rS.next()) {
 				
-				parts.add(new Part(rS.getString(2)));
+				parts.add(new Part(rS.getString(2), carVIN, rS.getDouble(3), rS.getInt(1)));
 				
 			}
+			
+			return parts;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -504,6 +510,37 @@ public class DAO implements DAOInterface
 		
 		return null;
 		
+	}
+
+	@Override
+	public ArrayList<OrderPart> getAllOrderParts() 
+	{
+		try {
+			
+			ArrayList<OrderPart> orderParts = new ArrayList<>();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT ordP.partType, ordP.carMake, ordP.carModel, ordP.carYear, ordP.quantity, "
+															+ "ord.receiver_address, ord.receiver_country, ord.receiver_name, ord.OrderID"
+															+ "FROM orders ord JOIN orderPart ordP "
+													   		+ "ON (ordP.orderID = ord.orderID) WHERE ord.dispatched = false");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				orderParts.add(new OrderPart(rS.getString(1), rS.getString(2), rS.getString(3), rS.getInt(4), rS.getInt(5),
+											rS.getString(6), rS.getString(7), rS.getString(8), rS.getInt(9)));
+				
+			}
+			
+			return orderParts;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 }
