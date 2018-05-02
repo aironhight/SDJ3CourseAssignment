@@ -83,7 +83,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 
 	private void assignPartsToOrders(int carID) 
 	{
-		ArrayList<Part> parts = dao.findAllPartsForCar(carID);
+		ArrayList<Part> parts = dao.findAllPartsFromCar(carID);
 	}
 
 	private void addParts(ArrayList<Part> parts, int carID) 

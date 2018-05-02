@@ -473,5 +473,11 @@ public class DAO implements DAOInterface
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public ArrayList<Part> findAllPartsFromCar(int carID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
