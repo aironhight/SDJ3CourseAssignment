@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import models.Car;
 import models.Part;
@@ -50,12 +51,25 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("CREATE SCHEMA IF NOT EXISTS facility_schema");
 				stm.executeUpdate("DROP TABLE IF EXISTS car CASCADE");
 				stm.executeUpdate("DROP TABLE IF EXISTS pallet CASCADE");
-				stm.executeUpdate("DROP TABLE IF EXISTS part");
+				stm.executeUpdate("DROP TABLE IF EXISTS part CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS orders CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS pick CASCADE");
+				stm.executeUpdate("DROP TABLE IF EXISTS orderParts CASCADE");
 				
-				stm.executeUpdate("CREATE TABLE part (id serial PRIMARY KEY, weight decimal NOT NULL CHECK(weight > 0)," + 
-									"part_type varchar NOT NULL," + 
-									"pallet_id int NOT NULL," + 
-									"car_id int NOT NULL)");
+				stm.executeUpdate("CREATE TABLE part (partID serial PRIMARY KEY, " +
+						 			"weight decimal NOT NULL CHECK(weight > 0)," + 
+									"partType varchar NOT NULL," + 
+									"palletID int NOT NULL," + 
+									"carID int NOT NULL)");
+
+				stm.executeUpdate("CREATE TABLE orderParts ("
+								+ "OrderPartID serial PRIMARY KEY,"
+								+ "PartType varchar not null,"
+								+ "CarMake varchar not null,"
+								+ "CarModel varchar not null,"
+								+ "CarYear int not null,"
+								+ "Quantity int not null,"
+								+ "OrderID int not null)");
 				
 				PreparedStatement stmt = conn.prepareStatement("CREATE TABLE car ("
 									+ "carID serial PRIMARY KEY, "
@@ -68,10 +82,26 @@ public class DAO implements DAOInterface
 				stmt.executeUpdate();
 				
 				stmt = conn.prepareStatement("CREATE TABLE pallet ("
-						+ "palletID serial PRIMARY KEY,"
-						+ "partType varchar(30) not null,"
-						+ "currentWeight real not null,"
-						+ "maximumWeight real not null)");
+									+ "palletID serial PRIMARY KEY,"
+									+ "partType varchar(30) not null,"
+									+ "currentWeight real not null,"
+									+ "maximumWeight real not null)");
+				
+				stmt.executeUpdate();
+				
+				stmt = conn.prepareStatement("CREATE TABLE pick(" 
+									+ "pickID serial PRIMARY KEY," 
+									+ "partID int NOT NULL," 
+									+ "orderID int NOT NULL)");
+				
+				stmt.executeUpdate();
+				
+				stmt = conn.prepareStatement("CREATE TABLE orders("
+									+ "orderID serial PRIMARY KEY," 
+									+ "receiver_address varchar NOT NULL,"
+									+ "receiver_country varchar NOT NULL,"
+									+ "receiver_name varchar NOT NULL,"
+									+ "dispatched boolean NOT NULL)");
 				
 				stmt.executeUpdate();
 				
@@ -79,9 +109,15 @@ public class DAO implements DAOInterface
 
 				stmt.close();
 
-				stm.executeUpdate("alter table part add foreign key (car_id) references car (carID) on delete restrict on update restrict");
+				stm.executeUpdate("alter table part add foreign key (carID) references car (carID) on delete restrict on update restrict");
 	
-				stm.executeUpdate("alter table part add foreign key (pallet_id) references pallet (palletID) on delete restrict on update restrict");
+				stm.executeUpdate("alter table part add foreign key (palletID) references pallet (palletID) on delete restrict on update restrict");
+				
+				stm.executeUpdate("alter table pick add foreign key (orderID) references orders (orderID) on delete restrict on update restrict");
+				
+				stm.executeUpdate("alter table pick add foreign key (partID) references part (partID) on delete restrict on update restrict");
+
+				stm.executeUpdate("alter table orderParts add foreign key (OrderID) references orders (orderID) on delete restrict on update restrict");
 				
 				stm.close();
 
@@ -101,31 +137,16 @@ public class DAO implements DAOInterface
 	
 	private void addPalletsType() throws SQLException 
 	{
-		addNewPallet("Engine", 1025.45);
-		addNewPallet("Doors", 425.50);
-		addNewPallet("Windows", 125.145);
-		addNewPallet("Battery", 200.0);
-		addNewPallet("Breakes", 98.756);
-		addNewPallet("Oil System", 105.55);
-		addNewPallet("Cooling System", 105.55);
-		addNewPallet("Fuel suply System", 185.0);
-		addNewPallet("Suspension", 200.4);
-		addNewPallet("Transmission System", 440.70);
-		
-		System.out.println("Pallets added");
-		System.out.println("------------------------------------------------");
-		
-		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM pallet");
-		
-		ResultSet rS = stmt.executeQuery();
-		
-		while (rS.next()) {
-			
-			System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getDouble(3) + " " + rS.getDouble(4));
-			
-		}
-		
-		stmt.close();
+		addNewPallet("engine", 1025.45);
+		addNewPallet("doors", 425.50);
+		addNewPallet("windows", 125.145);
+		addNewPallet("battery", 200.0);
+		addNewPallet("brakes", 98.756);
+		addNewPallet("oil system", 105.55);
+		addNewPallet("cooling system", 105.55);
+		addNewPallet("fuel system", 185.0);
+		addNewPallet("suspension", 200.4);
+		addNewPallet("transmission", 440.70);
 	}
 
 	@Override
@@ -144,7 +165,7 @@ public class DAO implements DAOInterface
 			
 			stmt.executeUpdate();
 			
-			stmt = conn.prepareStatement("CREATE * FROM car");
+			stmt = conn.prepareStatement("SELECT * FROM car");
 			
 			ResultSet rS = stmt.executeQuery();
 			
@@ -227,7 +248,7 @@ public class DAO implements DAOInterface
 				
 			} else {
 				
-				addNewPallet(part.getType(), Math.min(1200, part.getWeight() * 4));
+				addNewPallet(part.getType(), Math.min(2000, Math.max(part.getWeight() * 4, 100)));
 			
 				return keyLookupPalletByPartType(part.getType());
 			}
@@ -243,8 +264,8 @@ public class DAO implements DAOInterface
 	public void addPartRecord(Part part, int carID, int palletID) 
 	{
 		try {
-
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, pallet_id, car_id) VALUES (?, ?, ?, ?)");
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, car_id, pallet_id) VALUES (?, ?, ?, ?)");
 			
 			stmt.setDouble(1, part.getWeight());
 			stmt.setString(2, part.getType());
@@ -299,17 +320,15 @@ public class DAO implements DAOInterface
 	
 	private int keyLookupCarByVIN(String VIN) throws SQLException
 	{
-		PreparedStatement stmt = conn.prepareStatement("SELECT max(carID) FROM car WHERE VIN = ?");
+		PreparedStatement stmt = conn.prepareStatement("SELECT carID FROM car WHERE VIN = ?");
 		
 		stmt.setString(1, VIN);
 		
 		ResultSet rS = stmt.executeQuery();
 		
-		int index = -1;
+		rS.next();
 		
-		while (rS.next()) { index = rS.getInt(1); }
-		
-		return index;
+		return rS == null ? -1 : rS.getInt(1);
 	}
 
 	private int keyLookupPalletByPartType(String partType) throws SQLException
@@ -327,8 +346,108 @@ public class DAO implements DAOInterface
 		return index;
 	}
 	
-	
-	private String kurwa() {
-		return "your mom";
+	private void trackPartsByVin(String VIN) throws SQLException{
+		ArrayList<Part> parts = new ArrayList<Part>(); // List of the parts that came from the car
+		
+		PreparedStatement stmt = conn.prepareStatement //Find the parts that came from the car
+				("SELECT * FROM part p "
+				+ "JOIN car c" 
+				+"ON (p.car_id = c.carID"
+				+ "WHERE c.VIN = ?");
+		stmt.setString(1, VIN);
+		
+		ResultSet rs = stmt.executeQuery();
+		
+		while(rs.next()) { // Add all the parts to the arrayList
+			Part temp = new Part(rs.getString("part_type")
+								, rs.getString("car_id") 
+								, rs.getDouble("weight"));
+			
+			parts.add(temp);
+		}
 	}
+
+	public int addOrderFromReceiver(String receiverName, String receiverAddress, String receiverCountry) 
+	{
+
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO orders (receiver_name, receiver_address, receiver_country, dispatched)"
+															+ "VALUES(?, ?, ?, ?)");
+			
+			stmt.setString(1, receiverName);
+			stmt.setString(2, receiverAddress);
+			stmt.setString(3,  receiverCountry);
+			stmt.setBoolean(4, false);
+			
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("SELECT max(orderID) FROM orders");
+			
+			ResultSet rS = stmt.executeQuery(); rS.next();
+			
+			int orderID = rS.getInt(1);
+			
+			stmt = conn.prepareStatement("SELECT * FROM orders");
+			
+			rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " # " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getString(4) + " " + rS.getBoolean(5));
+				
+			}
+			
+			stmt.close();
+			
+			return orderID;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+
+	public void insertInOrderPart(String partType, String carMake, String carModel, int carYear, int quantity, int orderID) 
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO orderParts (partType, carMake, carModel, carYear, quantity, orderId) "
+															+ "VALUES (?, ?, ?, ?, ?, ?)");
+			
+			stmt.setString(1, partType);
+			stmt.setString(2, carMake);
+			stmt.setString(3, carModel);
+			stmt.setInt(4, carYear);
+			stmt.setInt(5, quantity);
+			stmt.setInt(6, orderID);
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void delete()
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM orderParts");
+			
+			stmt.executeUpdate();
+			
+			stmt = conn.prepareStatement("DELETE FROM orders");
+			
+			stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }

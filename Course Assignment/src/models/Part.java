@@ -8,7 +8,7 @@ public class Part implements Serializable
 	private String carVIN;
 	private String type;
 	
-	public Part (String type,String carVIN, double weight) {
+	public Part (String type, String carVIN, double weight) {
 		this.weight = weight;
 		this.carVIN = carVIN;
 		this.type = type;
@@ -24,10 +24,6 @@ public class Part implements Serializable
 
 	public String getCarVIN() {
 		return carVIN;
-	}
-
-	public void setCarVIN(String carVIN) {
-		this.carVIN = carVIN;
 	}
 
 	public String getType() {

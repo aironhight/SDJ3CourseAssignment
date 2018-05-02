@@ -34,15 +34,14 @@ CREATE TABLE pallet
 CREATE TABLE pick
 (
 	id serial PRIMARY KEY,
-	part_id varchar NOT NULL,
-	order_id varchar NOT NULL
+	part_id int NOT NULL,
+	order_id int NOT NULL,
 )
 ;
 
 CREATE TABLE order
 (
 	id int NOT NULL,
-	pick_id varchar NOT NULL
 	receiver_address varchar NOT NULL
 	receiver_country NOT NULL
 )
