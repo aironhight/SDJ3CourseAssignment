@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Part implements Serializable
 {
-	private double weight;
-	private String carVIN;
 	private String type;
+	private String carVIN;
+	private double weight;
 	private int id;
 	
 	public Part (String type, String carVIN, double weight) {

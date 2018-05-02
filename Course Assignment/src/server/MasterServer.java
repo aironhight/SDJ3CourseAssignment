@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import dao.DAO;
 import dao.DAOInterface;
 import models.Car;
+import models.Order;
 import models.OrderPart;
 import models.Part;
 
@@ -86,12 +87,29 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	{
 		ArrayList<Part> parts = dao.findAllPartsFromCar(carID, carVIN);	
 		
+		ArrayList<Order> orders = dao.getAllOrders();
+		
 		ArrayList<OrderPart> orderParts = dao.getAllOrderParts();
 		
-		boolean[] fr = new boolean[orderParts.size()];
-		
-		for (int i = 0; i < orderParts.size(); i++)
-			for (int j = 0; j < parts.size(); j++)
+		for (int i = 0; i < orders.size(); i++) {
+			
+			int orderID = orders.get(i).getOrderId();
+			
+			boolean canSupplyEverything = true;
+			
+			for (int j = 0; j < orderParts.size(); j++)
+				if (orderParts.get(i).getID() == orderID) {
+					
+					boolean current = false;
+					
+					for (int k = 0; k < parts.size(); k++)
+						if (parts.get(i).getType().equals(orderParts.get(j).getPartType())) {
+							
+						}
+					
+				}
+			
+		}
 		
 	}
 

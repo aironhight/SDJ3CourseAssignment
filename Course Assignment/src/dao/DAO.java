@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.Car;
+import models.Order;
 import models.OrderPart;
 import models.Part;
 import models.PartDestination;
@@ -489,9 +490,9 @@ public class DAO implements DAOInterface
 			ArrayList<Part> parts = new ArrayList<>();
 			
 			PreparedStatement stmt = conn.prepareStatement ("SELECT * FROM part p "
-							+ "JOIN car c " 
-							+ "ON (p.car_id = c.carID) "
-							+ "WHERE c.VIN = ? AND p.dispatched = false");
+																+ "JOIN car c " 
+																+ "ON (p.carID = c.carID) "
+																+ "WHERE c.VIN = ? AND p.dispatched = false");
 			
 			ResultSet rS = stmt.executeQuery();
 			
@@ -511,6 +512,31 @@ public class DAO implements DAOInterface
 		return null;
 		
 	}
+	
+	public ArrayList<Order> getAllOrders()
+	{
+		try {
+			
+			ArrayList<Order> orders = new ArrayList<>();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM orders WHERE dispatched = false");
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				orders.add(new Order(rS.getInt(1), rS.getString(2), rS.getString(3), rS.getString(4)));
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+		
+	}
 
 	@Override
 	public ArrayList<OrderPart> getAllOrderParts() 
@@ -519,17 +545,13 @@ public class DAO implements DAOInterface
 			
 			ArrayList<OrderPart> orderParts = new ArrayList<>();
 			
-			PreparedStatement stmt = conn.prepareStatement("SELECT ordP.partType, ordP.carMake, ordP.carModel, ordP.carYear, ordP.quantity, "
-															+ "ord.receiver_address, ord.receiver_country, ord.receiver_name, ord.OrderID"
-															+ "FROM orders ord JOIN orderPart ordP "
-													   		+ "ON (ordP.orderID = ord.orderID) WHERE ord.dispatched = false");
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM orderPart");
 			
 			ResultSet rS = stmt.executeQuery();
 			
 			while (rS.next()) {
 				
-				orderParts.add(new OrderPart(rS.getString(1), rS.getString(2), rS.getString(3), rS.getInt(4), rS.getInt(5),
-											rS.getString(6), rS.getString(7), rS.getString(8), rS.getInt(9)));
+				orderParts.add(new OrderPart(rS.getString(2), rS.getString(3), rS.getString(4), rS.getInt(5), rS.getInt(6), rS.getInt(7)));
 				
 			}
 			

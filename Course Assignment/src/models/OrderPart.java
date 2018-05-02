@@ -8,33 +8,22 @@ public class OrderPart {
 	private String carModel;
 	private int carYear;
 	private int quantity;
-	private String receiverAddress;
-	private String receiverCountry;
-	private String receiverName;
 	
-	public OrderPart(String partType, String carMake, String carModel, int carYear, 
-			int quantity, String receiverAddress, String receiverCountry, String receiverName) {
+	public OrderPart(String partType, String carMake, String carModel, int carYear, int quantity) {
 		this.partType = partType;
 		this.carMake = carMake;
 		this.carModel = carModel;
 		this.carYear = carYear;
 		this.quantity = quantity;
-		this.receiverAddress = receiverAddress;
-		this.receiverCountry = receiverCountry;
-		this.receiverName = receiverName;
 		orderID = -10;
 	}
 	
-	public OrderPart(String partType, String carMake, String carModel, int carYear, 
-			int quantity, String receiverAddress, String receiverCountry, String receiverName, int orderID) {
+	public OrderPart(String partType, String carMake, String carModel, int carYear, int quantity, int orderID) {
 		this.partType = partType;
 		this.carMake = carMake;
 		this.carModel = carModel;
 		this.carYear = carYear;
 		this.quantity = quantity;
-		this.receiverAddress = receiverAddress;
-		this.receiverCountry = receiverCountry;
-		this.receiverName = receiverName;
 		this.orderID = orderID;
 	}
 	public String getPartType() {
