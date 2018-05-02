@@ -481,10 +481,12 @@ public class DAO implements DAOInterface
 		}
 	}
 
-	@Override
-	public ArrayList<Part> findAllPartsFromCar(int carID) {
-		// TODO Auto-generated method stub
+	public ArrayList<Part> findAllPartsFromCar(int carID) 
+	{
+		
+		
 		return null;
+		
 	}
 	
 }
