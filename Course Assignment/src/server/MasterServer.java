@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import dao.DAO;
 import dao.DAOInterface;
 import models.Car;
+import models.OrderPart;
 import models.Part;
 
 public class MasterServer extends UnicastRemoteObject implements Server{
@@ -70,7 +71,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			
 			addParts(car.disassemble(), carID);
 			
-			assignPartsToOrders(carID);
+			assignPartsToOrders(carID, car.getVIN());
 		}
 		catch(Exception e)
 		{
@@ -81,9 +82,16 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 		return true;
 	}
 
-	private void assignPartsToOrders(int carID) 
+	private void assignPartsToOrders(int carID, String carVIN) 
 	{
-		ArrayList<Part> parts = dao.findAllPartsFromCar(carID);	
+		ArrayList<Part> parts = dao.findAllPartsFromCar(carID, carVIN);	
+		
+		ArrayList<OrderPart> orderParts = dao.getAllOrderParts();
+		
+		boolean[] fr = new boolean[orderParts.size()];
+		
+		for (int i = 0; i < orderParts.size(); i++)
+			for (int j = 0; j < parts.size(); j++)
 		
 	}
 
