@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import dao.DAO;
 import dao.DAOInterface;
 import models.Car;
+import models.Order;
 import models.OrderPart;
 import models.Part;
 
@@ -71,7 +72,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			
 			addParts(car.disassemble(), carID);
 			
-			assignPartsToOrders(carID, car.getVIN());
+			assignPartsToOrders(car, carID);
 		}
 		catch(Exception e)
 		{
@@ -82,16 +83,54 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 		return true;
 	}
 
-	private void assignPartsToOrders(int carID, String carVIN) 
+	private void assignPartsToOrders(Car car, int carID) 
 	{
-		ArrayList<Part> parts = dao.findAllPartsFromCar(carID, carVIN);	
+		ArrayList<Part> parts = dao.findAllPartsFromCar(carID, car.getVIN());	
+		
+		ArrayList<Order> orders = dao.getAllOrders();
 		
 		ArrayList<OrderPart> orderParts = dao.getAllOrderParts();
 		
-		boolean[] fr = new boolean[orderParts.size()];
+		boolean[] selected = new boolean[parts.size()];
 		
-		for (int i = 0; i < orderParts.size(); i++)
-			for (int j = 0; j < parts.size(); j++)
+		for (int i = 0; i < orders.size(); i++) {
+			
+			int orderID = orders.get(i).getOrderId();
+			
+			boolean canSupplyEverything = true;
+			boolean[] selectedCurrent = new boolean[parts.size()];
+			
+			for (int j = 0; j < orderParts.size(); j++)
+				if (orderParts.get(j).getID() == orderID) {
+					
+					boolean current = false;
+					
+					for (int k = 0; k < parts.size(); k++)
+						if (!selected[k] && parts.get(k).getType().equals(orderParts.get(j).getPartType())
+								&& orderParts.get(j).getCarMake().equals(car.getMake()) && orderParts.get(j).getCarModel().equals(car.getModel())
+								&& orderParts.get(j).getCarYear() == car.getYear()) {
+							
+							selectedCurrent[k] = true;
+							
+							current = true;
+							break;
+							
+						}
+					
+					if (!current) { canSupplyEverything = false; break; }
+					
+				}
+			
+			if (canSupplyEverything) {
+				
+				dao.updateOrderStatus(orders.get(i).getOrderId());
+				
+				for (int j = 0; j < parts.size(); j++)
+					if (selectedCurrent[j]) selected[j] = true;
+				
+			}
+			
+		}
 		
 	}
 
