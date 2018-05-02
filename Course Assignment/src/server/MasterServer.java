@@ -69,6 +69,8 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			int carID = dao.addCarRecord(car);
 			
 			addParts(car.disassemble(), carID);
+			
+			assignPartsToOrders(carID);
 		}
 		catch(Exception e)
 		{
@@ -77,6 +79,11 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			return false;
 		}
 		return true;
+	}
+
+	private void assignPartsToOrders(int carID) 
+	{
+		ArrayList<Part> parts = dao.findAllPartsForCar(carID);
 	}
 
 	private void addParts(ArrayList<Part> parts, int carID) 
