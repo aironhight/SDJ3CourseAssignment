@@ -7,11 +7,20 @@ public class Part implements Serializable
 	private double weight;
 	private String carVIN;
 	private String type;
+	private int id;
 	
 	public Part (String type, String carVIN, double weight) {
 		this.weight = weight;
 		this.carVIN = carVIN;
 		this.type = type;
+		id = -10;
+	}
+	
+	public Part (String type, String carVIN, double weight, int id) {
+		this.weight = weight;
+		this.carVIN = carVIN;
+		this.type = type;
+		this.id = id;
 	}
 
 	public double getWeight() {
@@ -32,6 +41,14 @@ public class Part implements Serializable
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public int getID() {
+		return id;
+	}
+	
+	public void setID(int id) {
+		this.id = id;
 	}
 	
 }
