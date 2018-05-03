@@ -65,7 +65,7 @@ public class DAO implements DAOInterface
 				stm.executeUpdate("DROP TABLE IF EXISTS orderParts CASCADE");
 				
 				stm.executeUpdate("CREATE TABLE part (partID serial PRIMARY KEY, " +
-						 			"weight decimal NOT NULL CHECK(weight > 0)," + 
+						 			"weight real NOT NULL CHECK(weight > 0)," + 
 									"partType varchar NOT NULL," +
 						 			"dispatched boolean NOT NULL," + 
 									"palletID int NOT NULL," + 
@@ -163,20 +163,6 @@ public class DAO implements DAOInterface
 			
 			stmt.executeUpdate();
 			
-			stmt = conn.prepareStatement("SELECT * FROM car");
-			
-			ResultSet rS = stmt.executeQuery();
-			
-			System.out.println("-----------------------------------------------------");
-			
-			while (rS.next()) {
-				
-				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3)+ " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
-				
-			}
-			
-			stmt.close();
-			
 			return keyLookupCarByVIN(car.getVIN());
 		
 		} catch (SQLException e) {
@@ -184,31 +170,7 @@ public class DAO implements DAOInterface
 			e.printStackTrace();
 		}
 		
-		printAllCars();
-		
 		return -1;
-	}
-
-	private void printAllCars() 
-	{
-		try {
-			
-			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM car");
-			
-			ResultSet rS = stmt.executeQuery();
-			
-			while (rS.next()) {
-				
-				System.out.println(rS.getInt(1) + " #  " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
-				
-			}
-			
-			System.out.println("---------------------------");
-		
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public int findPalletForPart(Part part)
@@ -263,7 +225,7 @@ public class DAO implements DAOInterface
 	{
 		try {
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, part_type, car_id, pallet_id, dispatched) VALUES (?, ?, ?, ?, false)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO part (weight, partType, carID, palletID, dispatched) VALUES (?, ?, ?, ?, false)");
 			
 			stmt.setDouble(1, part.getWeight());
 			stmt.setString(2, part.getType());
@@ -271,16 +233,6 @@ public class DAO implements DAOInterface
 			stmt.setInt(4, palletID);
 			
 			stmt.executeUpdate();
-			
-			stmt = conn.prepareStatement("SELECT * FROM part");
-			
-			ResultSet rS = stmt.executeQuery();
-			
-			while (rS.next()) {
-				
-				System.out.println(rS.getInt(1) + " " + rS.getDouble(2) + " " + rS.getString(3) + " " + rS.getInt(4) + " " + rS.getInt(5) + " --");
-				
-			}
 			
 			stmt.close();
 			
@@ -495,16 +447,18 @@ public class DAO implements DAOInterface
 			
 			ArrayList<Part> parts = new ArrayList<>();
 			
-			PreparedStatement stmt = conn.prepareStatement ("SELECT * FROM part p "
-																+ "JOIN car c " 
+			PreparedStatement stmt = conn.prepareStatement ("SELECT p.partType, p.weight, p.partID "
+																+ "FROM part p INNER JOIN car c " 
 																+ "ON (p.carID = c.carID) "
 																+ "WHERE c.VIN = ? AND p.dispatched = false");
+			
+			stmt.setString(1, carVIN);
 			
 			ResultSet rS = stmt.executeQuery();
 			
 			while (rS.next()) {
 				
-				parts.add(new Part(rS.getString(2), carVIN, rS.getDouble(3), rS.getInt(1)));
+				parts.add(new Part(rS.getString(1), carVIN, rS.getDouble(2), rS.getInt(3)));
 				
 			}
 			
@@ -551,13 +505,13 @@ public class DAO implements DAOInterface
 			
 			ArrayList<OrderPart> orderParts = new ArrayList<>();
 			
-			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM orderPart");
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM orderParts");
 			
 			ResultSet rS = stmt.executeQuery();
 			
 			while (rS.next()) {
 				
-				orderParts.add(new OrderPart(rS.getString(2), rS.getString(3), rS.getString(4), rS.getInt(5), rS.getInt(7)));
+				orderParts.add(new OrderPart(rS.getString(2), rS.getString(3), rS.getString(4), rS.getInt(5), rS.getInt(6)));
 				
 			}
 			
@@ -602,8 +556,72 @@ public class DAO implements DAOInterface
 			
 			while (rS.next()) {
 				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3) + " " + 
+							rS.getInt(4) + " " + rS.getString(5) + " " + rS.getDouble(6));
 				
 			}
+			
+			stmt = conn.prepareStatement("SELECT * FROM part");
+			
+			rS = stmt.executeQuery();
+
+			System.out.println("------------------------------------- PART -------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getDouble(2) + " " + rS.getString(3) + " " + 
+							rS.getBoolean(4) + " " + rS.getInt(5) + " " + rS.getInt(6));
+				
+			}
+						
+			stmt = conn.prepareStatement("SELECT * FROM pallet");
+			
+			rS = stmt.executeQuery();
+
+			System.out.println("------------------------------------- PALLET -------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getDouble(3) + " " + rS.getDouble(4));
+				
+			}
+			
+			stmt = conn.prepareStatement("SELECT * FROM pick");
+			
+			rS = stmt.executeQuery();
+
+			System.out.println("------------------------------------- PICK -------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getInt(2) + " " + rS.getInt(3));
+				
+			}
+			
+			stmt = conn.prepareStatement("SELECT * FROM orders");
+			
+			rS = stmt.executeQuery();
+
+			System.out.println("------------------------------------- ORDERS -------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getString(4) + " " + rS.getBoolean(5));
+				
+			}
+			
+			stmt = conn.prepareStatement("SELECT * FROM orderParts");
+			
+			rS = stmt.executeQuery();
+
+			System.out.println("------------------------------------- ORDER_PART -------------------------------------");
+			
+			while (rS.next()) {
+				
+				System.out.println(rS.getInt(1) + " " + rS.getString(2) + " " + rS.getString(3) + " " + rS.getString(4) + " " + rS.getInt(5) + " " + rS.getInt(6));
+				
+			}
+			
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

@@ -37,7 +37,6 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 
 			Naming.rebind ("MServer", server);
 			
-
 			System.out.println ("Master server online..");
 		}
 		catch (RemoteException e) 
@@ -76,7 +75,8 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 		}
 		catch(Exception e)
 		{
-			System.out.println("DATABASE connection error");
+			System.out.println(e.getStackTrace());
+			//System.out.println("DATABASE connection error");
 			
 			return false;
 		}

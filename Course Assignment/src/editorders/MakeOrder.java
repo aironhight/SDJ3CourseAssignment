@@ -37,11 +37,11 @@ public class MakeOrder
 				
 				if (!chose.toLowerCase().equals("yes")) break;
 				
-				System.out.println("Part Type :"); partType = in.nextLine();
+				System.out.println("Part Type :"); partType = in.nextLine().toLowerCase();
 				
-				System.out.println("Car Make :"); carMake = in.nextLine();
+				System.out.println("Car Make :"); carMake = in.nextLine().toLowerCase();
 				
-				System.out.println("Car Model :"); carModel = in.nextLine();
+				System.out.println("Car Model :"); carModel = in.nextLine().toLowerCase();
 				
 				System.out.println("Car Year :"); carYear = Integer.parseInt(in.nextLine());
 				
