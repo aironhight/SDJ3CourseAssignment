@@ -123,10 +123,10 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			
 			if (canSupplyEverything) {
 				
-				dao.updateOrderStatus(orders.get(i).getOrderId());
+				dao.orderDispatched(orders.get(i).getOrderId());
 				
 				for (int j = 0; j < parts.size(); j++)
-					if (selectedCurrent[j]) selected[j] = true;
+					if (selectedCurrent[j]) { selected[j] = true; dao.partDispatched(parts.get(i).getID()); }
 				
 			}
 			

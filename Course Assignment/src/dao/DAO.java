@@ -459,7 +459,7 @@ public class DAO implements DAOInterface
 			
 			while (rS.next()) {
 				
-				parts.add(new Part(rS.getString(1), carVIN, rS.getDouble(2), rS.getInt(3)));
+				parts.add(new Part(rS.getString(1).toLowerCase(), carVIN, rS.getDouble(2), rS.getInt(3)));
 				
 			}
 			
@@ -486,7 +486,7 @@ public class DAO implements DAOInterface
 			
 			while (rS.next()) {
 				
-				orders.add(new Order(rS.getInt(1), rS.getString(2), rS.getString(3), rS.getString(4)));
+				orders.add(new Order(rS.getInt(1), rS.getString(2).toLowerCase(), rS.getString(3).toLowerCase(), rS.getString(4).toLowerCase()));
 				
 			}
 			
@@ -512,7 +512,8 @@ public class DAO implements DAOInterface
 			
 			while (rS.next()) {
 				
-				orderParts.add(new OrderPart(rS.getString(2), rS.getString(3), rS.getString(4), rS.getInt(5), rS.getInt(6)));
+				orderParts.add(new OrderPart(rS.getString(2).toLowerCase(), rS.getString(3).toLowerCase(), rS.getString(4).toLowerCase(), 
+														rS.getInt(5), rS.getInt(6)));
 				
 			}
 			
@@ -527,13 +528,31 @@ public class DAO implements DAOInterface
 	}
 
 	@Override
-	public void updateOrderStatus(int orderId) 
+	public void orderDispatched(int orderID) 
 	{
 		try {
 			
 			PreparedStatement stmt = conn.prepareStatement("UPDATE orders SET dispatched = true WHERE orderID = ?");
 			
-			stmt.setInt(1, orderId);
+			stmt.setInt(1, orderID);
+			
+			stmt.executeUpdate();
+			
+			stmt.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void partDispatched(int partID)
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("UPDATE part SET dispatched = true WHERE partID = ?");
+			
+			stmt.setInt(1, partID);
 			
 			stmt.executeUpdate();
 			

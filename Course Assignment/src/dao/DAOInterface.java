@@ -17,5 +17,6 @@ public interface DAOInterface
 	ArrayList<Part> findAllPartsFromCar(int carID, String carVIN);
 	ArrayList<OrderPart> getAllOrderParts();
 	ArrayList<Order> getAllOrders();
-	void updateOrderStatus(int orderId);
+	void orderDispatched(int orderId);
+	void partDispatched(int id);
 }
