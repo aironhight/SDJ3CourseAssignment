@@ -31,8 +31,6 @@ public class LocalServerMain extends UnicastRemoteObject implements LocalServerI
 	@Override
 	public boolean registerCar(Car car) throws RemoteException 
 	{
-		boolean b = server.registerCar(car);
-		
-		return b;
+		return server.registerCar(car);
 	}
 }

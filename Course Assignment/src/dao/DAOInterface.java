@@ -14,9 +14,10 @@ public interface DAOInterface
 	void addPartRecord(Part part, int carID, int palletID);
 	void insertInOrderPart(OrderPart orderPart);
 	int addOrderFromReceiver(Order order); 
-	ArrayList<Part> findAllPartsFromCar(int carID, String carVIN);
-	ArrayList<OrderPart> getAllOrderParts();
 	ArrayList<Order> getAllOrders();
+	ArrayList<OrderPart> getAllCarParts();
+	ArrayList<OrderPart> getAllOrderParts();
 	void orderDispatched(int orderId);
 	void partDispatched(int id);
+	void addPick(int id, int orderID);
 }

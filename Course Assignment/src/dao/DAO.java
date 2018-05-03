@@ -136,10 +136,10 @@ public class DAO implements DAOInterface
 	private void addPalletsType() throws SQLException 
 	{
 		addNewPallet("engine", 1025.45);
-		addNewPallet("doors", 425.50);
-		addNewPallet("windows", 125.145);
+		addNewPallet("door", 425.50);
+		addNewPallet("window", 125.145);
 		addNewPallet("battery", 200.0);
-		addNewPallet("brakes", 98.756);
+		addNewPallet("brake", 98.756);
 		addNewPallet("oil system", 105.55);
 		addNewPallet("cooling system", 105.55);
 		addNewPallet("fuel system", 185.0);
@@ -442,28 +442,26 @@ public class DAO implements DAOInterface
 		}
 	}
 
-	public ArrayList<Part> findAllPartsFromCar(int carID, String carVIN) 
+	public ArrayList<OrderPart> getAllCarParts() 
 	{
 		try {
 			
-			ArrayList<Part> parts = new ArrayList<>();
+			ArrayList<OrderPart> answer = new ArrayList<>();
 			
-			PreparedStatement stmt = conn.prepareStatement ("SELECT p.partType, p.weight, p.partID "
+			PreparedStatement stmt = conn.prepareStatement ("SELECT p.partType, c.make, c.model, c.year, p.partID "
 																+ "FROM part p INNER JOIN car c " 
 																+ "ON (p.carID = c.carID) "
-																+ "WHERE c.VIN = ? AND p.dispatched = false");
-			
-			stmt.setString(1, carVIN);
+																+ "WHERE p.dispatched = false");
 			
 			ResultSet rS = stmt.executeQuery();
 			
 			while (rS.next()) {
 				
-				parts.add(new Part(rS.getString(1).toLowerCase(), carVIN, rS.getDouble(2), rS.getInt(3)));
+				answer.add(new OrderPart(rS.getString(1), rS.getString(2), rS.getString(3), rS.getInt(4), rS.getInt(5)));
 				
 			}
 			
-			return parts;
+			return answer;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -489,6 +487,8 @@ public class DAO implements DAOInterface
 				orders.add(new Order(rS.getInt(1), rS.getString(2).toLowerCase(), rS.getString(3).toLowerCase(), rS.getString(4).toLowerCase()));
 				
 			}
+			
+			return orders;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -558,6 +558,25 @@ public class DAO implements DAOInterface
 			
 			stmt.close();
 		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void addPick(int partID, int orderID)
+	{
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO pick (partID, orderID) values (?, ?)");
+			
+			stmt.setInt(1, partID);
+			stmt.setInt(2, orderID);
+			
+			stmt.executeUpdate();
+			
+			stmt.close();
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

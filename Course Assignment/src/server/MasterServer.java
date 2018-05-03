@@ -71,7 +71,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			
 			addParts(car.disassemble(), carID);
 			
-			assignPartsToOrders(car, carID);
+			matchPartToOrder();
 		}
 		catch(Exception e)
 		{
@@ -83,38 +83,38 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 		return true;
 	}
 
-	private void assignPartsToOrders(Car car, int carID) 
+	private void matchPartToOrder() 
 	{
-		ArrayList<Part> parts = dao.findAllPartsFromCar(carID, car.getVIN());	
-		
 		ArrayList<Order> orders = dao.getAllOrders();
+
+		ArrayList<OrderPart> carParts = dao.getAllCarParts();
 		
 		ArrayList<OrderPart> orderParts = dao.getAllOrderParts();
 		
-		boolean[] selected = new boolean[parts.size()];
+		boolean[] selected = new boolean[carParts.size()];
 		
 		for (int i = 0; i < orders.size(); i++) {
 			
 			int orderID = orders.get(i).getOrderId();
 			
 			boolean canSupplyEverything = true;
-			boolean[] selectedCurrent = new boolean[parts.size()];
+			boolean[] selectedCurrent = new boolean[carParts.size()];
 			
 			for (int j = 0; j < orderParts.size(); j++)
 				if (orderParts.get(j).getID() == orderID) {
 					
 					boolean current = false;
 					
-					for (int k = 0; k < parts.size(); k++)
-						if (!selected[k] && parts.get(k).getType().equals(orderParts.get(j).getPartType())
-								&& orderParts.get(j).getCarMake().equals(car.getMake()) && orderParts.get(j).getCarModel().equals(car.getModel())
-								&& orderParts.get(j).getCarYear() == car.getYear()) {
+					for (int k = 0; k < carParts.size(); k++)
+						if (!selectedCurrent[k] && orderParts.get(j).getPartType().equalsIgnoreCase(carParts.get(k).getPartType())
+					 		&& orderParts.get(j).getCarMake().equalsIgnoreCase(carParts.get(k).getCarMake())
+					 		&& orderParts.get(j).getCarModel().equalsIgnoreCase(carParts.get(k).getCarModel())
+					 		&& orderParts.get(j).getCarYear() == carParts.get(k).getCarYear()) {
 							
-							selectedCurrent[k] = true;
+								selectedCurrent[k] = true;
 							
-							current = true;
-							break;
-							
+								current = true;
+								break;
 						}
 					
 					if (!current) { canSupplyEverything = false; break; }
@@ -125,8 +125,13 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 				
 				dao.orderDispatched(orders.get(i).getOrderId());
 				
-				for (int j = 0; j < parts.size(); j++)
-					if (selectedCurrent[j]) { selected[j] = true; dao.partDispatched(parts.get(i).getID()); }
+				for (int j = 0; j < carParts.size(); j++)
+					if (selectedCurrent[j]) { 
+						selected[j] = true; 
+						
+						dao.partDispatched(carParts.get(j).getID()); 
+						dao.addPick(carParts.get(j).getID(), orderID);
+					}
 				
 			}
 			
