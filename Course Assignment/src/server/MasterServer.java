@@ -20,7 +20,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	private Registry registry;
 	private ArrayList<Car> cars;
 	private ArrayList<String> requests;
-	private DAOInterface dao;
+	private static DAOInterface dao;
 	
 	public MasterServer(int registryPort) throws RemoteException
     {
@@ -40,6 +40,8 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			Naming.rebind ("MServer", server);
 			
 			System.out.println ("Master server online..");
+			
+			dao.trackPartsByVin("OFOOGP3040");
 		}
 		catch (RemoteException e) 
 		{

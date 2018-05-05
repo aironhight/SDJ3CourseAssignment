@@ -6,11 +6,11 @@ public class PartDestination {
 	private String receiverAddress;
 	private String receiverCountry;
 	
-	public PartDestination(String partType, String receiverName, String receiverAddress, String receiverCity) {
+	public PartDestination(String partType, String receiverName, String receiverAddress, String receiverCountry) {
 		this.partType = partType;
 		this.receiverName = receiverName;
 		this.receiverAddress = receiverAddress;
-		this.receiverCountry = receiverCity;
+		this.receiverCountry = receiverCountry;
 	}
 
 	public String getPartType() {
@@ -27,5 +27,10 @@ public class PartDestination {
 
 	public String getReceiverCountry() {
 		return receiverCountry;
+	}
+	
+	public String toString()
+	{
+		return partType + " " + receiverName + " " + receiverAddress + " " + receiverCountry;
 	}
 }

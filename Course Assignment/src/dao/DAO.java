@@ -296,86 +296,67 @@ public class DAO implements DAOInterface
 		return index;
 	}
 	
-	public String trackPartsByVin(String VIN) {
-		ArrayList<Integer> partIdList = new ArrayList<Integer>(); // List of the parts that came from the car
+	public String trackPartsByVin(String VIN) 
+	{
+		PreparedStatement stmt;
 		
-		PreparedStatement stmt = conn.prepareStatement("SELECT partID FROM part p "
-														+ "JOIN car c " 
-														+ "ON (p.carID = c.carID) "
-														+ "WHERE c.VIN = ?");
-		
-		stmt.setString(1, VIN);
-		
-		ResultSet rs = stmt.executeQuery(); // get all the ID's of parts which come from the specified car
-		
-		while(rs.next()) { // Add all the parts to the arrayList
-			partIdList.add(rs.getInt("partID"));
-		}
-		
-		if(partIdList.size() == 0) {
-			System.out.println("The list of parts is empty *LINE 365 DAO.java*"); // Debugging purpose
-			return null;
-		}
-		
-		/* AT THIS POINT WE HAVE ALL THE PART ID's THAT WE ARE TRYING TO TRACK */
-		
-		ArrayList<Pick> pickList = new ArrayList<Pick>(); // list of picks that we will get from the next query
-		//get the pick of each part.
-		for(int i=0; i<partIdList.size(); i++) {
-			stmt = conn.prepareStatement
-					("SELECT * FROM pick WHERE partId = " + partIdList.get(i) + "ORDER BY partId");
-			rs = stmt.executeQuery();
+		try {
 			
-			while(rs.next()) {
-				pickList.add(new Pick(rs.getInt("pickID"), rs.getInt("partID"), rs.getInt("orderID"))); //add the picks to the picklist
+			stmt = conn.prepareStatement("SELECT p.partType, o.receiver_name, o.receiver_address, o.receiver_country "
+												+ "FROM pick pi "
+												+ "JOIN orders o ON (o.orderID = pi.orderID) "
+												+ "JOIN part p ON (p.partID = pi.partID) "
+												+ "WHERE p.partID in (SELECT pp.partID from part pp JOIN car cc ON (pp.carID = cc.carID) WHERE cc.VIN = ?)");
+
+			stmt.setString(1, VIN);
+			
+			ResultSet rS = stmt.executeQuery();
+			
+			ArrayList<PartDestination> dispatchedParts = new ArrayList<>();
+			ArrayList<PartDestination> unDispatchedParts = new ArrayList<>();
+			
+			while (rS.next()) {
+				
+				dispatchedParts.add(new PartDestination(rS.getString(1), rS.getString(2), rS.getString(3), rS.getString(4)));
+				
 			}
-		}
-		
-		/* AT THIS POINT WE HAVE ALL THE PICK ID's THAT CONTAIN THE PARTS THAT WE TRACK */
-		if(pickList.size() == 0) {
-			System.out.println("The pick id list is empty *LINE 388 DAO.java*");
-			return null;
-		}
-		
-		//Now we need to make objects of PartDestination containing info about the part type and where it went to.
-		ArrayList<PartDestination> partDestinations = new ArrayList<PartDestination>(pickList.size());
-		
-		
-		
-		for(int i=0; i<pickList.size(); i++) {			
-			stmt = conn.prepareStatement("SELECT pa.part_type, o.receiver_name, o.receiver_address, o.receiver_country"
-					+ "FROM pick p "
-					+ "JOIN part pa ON (p.partID = pa.partID) "
-					+ "JOIN orders o ON (p.orderID = o.orderID)"
-					+ "WHERE (p.partID = ?) and (p.orderID = ?)");
 			
-			stmt.setInt(1, pickList.get(i).getPartId()); 
-			stmt.setInt(2, pickList.get(i).getOrderId());
+			stmt = conn.prepareStatement("SELECT ppp.partType "
+											+ "FROM part ppp " 
+											+ "JOIN car ccc ON (ppp.carID = ccc.carID) " 
+											+ "WHERE ppp.partID not in ( "
+										    + "SELECT p.partID "
+											+ "FROM pick pi " 
+											+ "JOIN orders o ON (o.orderID = pi.orderID) " 
+											+ "JOIN part p ON (p.partID = pi.partID) "
+											+ "WHERE p.partID in (SELECT pp.partID from part pp JOIN car cc ON (pp.carID = cc.carID) WHERE cc.VIN = ?)) AND ccc.VIN = ?");
 			
-			rs = stmt.executeQuery();
-			//and them to the list
-			while(rs.next()) {
-				partDestinations.add(new PartDestination(rs.getString("part_type"), rs.getString("receiver_name")
-						, rs.getString("receiver_address"), rs.getString("receiver_country")));
+			stmt.setString(1, VIN);
+			stmt.setString(2, VIN);
+			
+			rS = stmt.executeQuery();
+			
+			while (rS.next()) {
+				
+				unDispatchedParts.add(new PartDestination(rS.getString(1), "In The Warehouse", "", ""));
+				
 			}
-		}
-		JSONObject jResult = new JSONObject();
-		JSONArray jArray = new JSONArray();
-		for(int i=0; i<partDestinations.size(); i++) {
-			JSONObject jGroup = new JSONObject();
-			jGroup.put("part_type", partDestinations.get(i).getPartType());
-			jGroup.put("receiver_name", partDestinations.get(i).getReceiverName());
-			jGroup.put("receiver_address", partDestinations.get(i).getReceiverAddress());
-			//jGroup.put("receiver_country", partDestinations.get(i).getReceiverCountry());
 			
-			JSONObject jOuter = new JSONObject();
-			jOuter.put("part_info", jGroup);
+			for (int i = 0; i < dispatchedParts.size(); i++)
+				System.out.println(dispatchedParts.get(i));
 			
-			jArray.put(jOuter);
+			System.out.println("-------------------------------------------------------");
+			
+			for (int i = 0; i < unDispatchedParts.size(); i++)
+				System.out.println(unDispatchedParts.get(i));
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		jResult.put("result", jArray);
 		
-		return jResult;
+		
+		return "";
 	}
 
 	public int addOrderFromReceiver(Order order) 
