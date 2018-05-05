@@ -296,14 +296,14 @@ public class DAO implements DAOInterface
 		return index;
 	}
 	
-	private JSONObject trackPartsByVin(String VIN) throws SQLException, JSONException{
+	public String trackPartsByVin(String VIN) {
 		ArrayList<Integer> partIdList = new ArrayList<Integer>(); // List of the parts that came from the car
 		
-		PreparedStatement stmt = conn.prepareStatement //Find the parts that came from the car
-				("SELECT partID FROM part p "
-				+ "JOIN car c" 
-				+"ON (p.car_id = c.carID)"
-				+ "WHERE c.VIN = ?");
+		PreparedStatement stmt = conn.prepareStatement("SELECT partID FROM part p "
+														+ "JOIN car c " 
+														+ "ON (p.carID = c.carID) "
+														+ "WHERE c.VIN = ?");
+		
 		stmt.setString(1, VIN);
 		
 		ResultSet rs = stmt.executeQuery(); // get all the ID's of parts which come from the specified car

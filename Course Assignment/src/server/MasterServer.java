@@ -19,6 +19,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	private Registry registry;
 	private ArrayList<Car> cars;
+	private ArrayList<String> requests;
 	private DAOInterface dao;
 	
 	public MasterServer(int registryPort) throws RemoteException
@@ -26,6 +27,7 @@ public class MasterServer extends UnicastRemoteObject implements Server{
         super();
         registry = LocateRegistry.createRegistry(registryPort);
         cars = new ArrayList<Car>();
+        requests = new ArrayList<>();
         dao = new DAO();
     }
 
@@ -56,8 +58,11 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 	
 	
 	@Override
-	public String trackPart(String carVin) throws RemoteException {
-		return "kurwa";
+	public String trackPart(String carVin) throws RemoteException 
+	{
+		requests.add(carVin);
+		
+		return dao.trackPartsByVin(carVin);
 	}
 
 	@Override

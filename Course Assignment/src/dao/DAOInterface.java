@@ -20,4 +20,5 @@ public interface DAOInterface
 	void orderDispatched(int orderId);
 	void partDispatched(int id);
 	void addPick(int id, int orderID);
+	String trackPartsByVin(String VIN);
 }

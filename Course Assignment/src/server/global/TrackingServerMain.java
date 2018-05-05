@@ -1,26 +1,25 @@
-package server.local;
+package server.global;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Scanner;
+import server.*;
 
-import models.Car;
-import models.Part;
-import server.Server;
+public class TrackingServerMain extends UnicastRemoteObject implements GlobalServer {
 
-public class LocalServerMain extends UnicastRemoteObject implements LocalServerInterface{
-
-	private ArrayList<Car> cars;
 	private Server server;
+	private ArrayList<String> requests;
 	
-	public LocalServerMain() throws RemoteException {
+	public TrackingServerMain() throws RemoteException {
 		super();
 		
-		cars = new ArrayList<>();
+		requests = new ArrayList<String>();
 		
 		try 
 		{
@@ -33,10 +32,11 @@ public class LocalServerMain extends UnicastRemoteObject implements LocalServerI
 	}
 
 	@Override
-	public boolean registerCar(Car car) throws RemoteException 
+	public String trackPart(String carVin) throws RemoteException 
 	{
-		cars.add(car);
+		requests.add(carVin);
 		
-		return server.registerCar(car);
+		return server.trackPart(carVin);
 	}
+
 }
