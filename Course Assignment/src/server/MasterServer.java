@@ -40,8 +40,6 @@ public class MasterServer extends UnicastRemoteObject implements Server{
 			Naming.rebind ("MServer", server);
 			
 			System.out.println ("Master server online..");
-			
-			dao.trackPartsByVin("OFOOGP3040");
 		}
 		catch (RemoteException e) 
 		{

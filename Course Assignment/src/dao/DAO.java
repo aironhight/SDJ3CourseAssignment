@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -135,16 +136,16 @@ public class DAO implements DAOInterface
 	
 	private void addPalletsType() throws SQLException 
 	{
-		addNewPallet("engine", 1025.45);
-		addNewPallet("door", 425.50);
-		addNewPallet("window", 125.145);
-		addNewPallet("battery", 200.0);
-		addNewPallet("brake", 98.756);
-		addNewPallet("oil system", 105.55);
-		addNewPallet("cooling system", 105.55);
-		addNewPallet("fuel system", 185.0);
-		addNewPallet("suspension", 200.4);
-		addNewPallet("transmission", 440.70);
+		addNewPallet("engine", 0, 1025.45);
+		addNewPallet("door", 0, 425.50);
+		addNewPallet("window", 0, 125.145);
+		addNewPallet("battery", 0, 200.0);
+		addNewPallet("brake", 0, 98.756);
+		addNewPallet("oil system", 0, 105.55);
+		addNewPallet("cooling system", 0, 105.55);
+		addNewPallet("fuel system", 0, 185.0);
+		addNewPallet("suspension", 0, 200.4);
+		addNewPallet("transmission", 0, 440.70);
 	}
 
 	@Override
@@ -208,7 +209,7 @@ public class DAO implements DAOInterface
 				
 			} else {
 				
-				addNewPallet(part.getType(), Math.min(2000, Math.max(part.getWeight() * 4, 100)));
+				addNewPallet(part.getType(), part.getWeight(), Math.min(2000, Math.max(part.getWeight() * 4, 100)));
 			
 				return keyLookupPalletByPartType(part.getType());
 			}
@@ -242,12 +243,13 @@ public class DAO implements DAOInterface
 		}
 	}
 
-	private void addNewPallet(String type, double maximumWeight) throws SQLException 
+	private void addNewPallet(String type, double currentWeight, double maximumWeight) throws SQLException 
 	{
-		PreparedStatement stmt = conn.prepareStatement("INSERT INTO pallet (partType, currentWeight, maximumWeight) VALUES (?, 0, ?)"); 
+		PreparedStatement stmt = conn.prepareStatement("INSERT INTO pallet (partType, currentWeight, maximumWeight) VALUES (?, ?, ?)"); 
 		
 		stmt.setString(1, type);
-		stmt.setDouble(2, maximumWeight);
+		stmt.setDouble(2, currentWeight);
+		stmt.setDouble(3, maximumWeight);
 		
 		stmt.executeUpdate();
 		
@@ -338,17 +340,21 @@ public class DAO implements DAOInterface
 			
 			while (rS.next()) {
 				
-				unDispatchedParts.add(new PartDestination(rS.getString(1), "In The Warehouse", "", ""));
+				unDispatchedParts.add(new PartDestination(rS.getString(1), "In the warehouse", "", ""));
 				
 			}
 			
-			for (int i = 0; i < dispatchedParts.size(); i++)
-				System.out.println(dispatchedParts.get(i));
+			PartDestination[] parts = new PartDestination[dispatchedParts.size() + unDispatchedParts.size()];
 			
-			System.out.println("-------------------------------------------------------");
+			for (int i = 0; i < dispatchedParts.size(); i++) parts[i] = dispatchedParts.get(i);
 			
-			for (int i = 0; i < unDispatchedParts.size(); i++)
-				System.out.println(unDispatchedParts.get(i));
+			int size = dispatchedParts.size();
+			
+			for (int i = 0; i < unDispatchedParts.size(); i++) parts[size + i] = unDispatchedParts.get(i);
+			
+			JSONArray array = new JSONArray(Arrays.asList(parts));
+			
+			return array.toString();
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -356,7 +362,7 @@ public class DAO implements DAOInterface
 		}
 		
 		
-		return "";
+		return "-1";
 	}
 
 	public int addOrderFromReceiver(Order order) 

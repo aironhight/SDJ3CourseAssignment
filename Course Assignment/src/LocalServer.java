@@ -3,6 +3,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import models.*;
+import server.global.TrackingServerMain;
 import server.local.LocalServerMain;
 
 import org.json.*;
@@ -10,16 +11,19 @@ import org.json.*;
 public class LocalServer 
 {
 	private ArrayList<Car> cars;
-	private LocalServerMain main;
+	private LocalServerMain mainLocalServer;
+	private TrackingServerMain mainTrackingServer;
 		
 	public LocalServer()
 	{
 		cars = new ArrayList<>();
-		main = null;
+		mainLocalServer = null;
+		mainTrackingServer = null;
 		
 		try {
 			
-			main = new LocalServerMain();
+			mainLocalServer = new LocalServerMain();
+			mainTrackingServer = new TrackingServerMain();
 			
 			System.out.println("Local Server Launched");
 			
@@ -54,7 +58,7 @@ public class LocalServer
 			
 			try {
 				
-				main.registerCar(newCar);
+				mainLocalServer.registerCar(newCar);
 				
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
@@ -71,5 +75,19 @@ public class LocalServer
 		}
 		
 		return false;
+	}
+
+	public String trackPart(String carVin) 
+	{
+		try {
+			
+			return mainTrackingServer.trackPart(carVin);
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "-1";
 	}
 }

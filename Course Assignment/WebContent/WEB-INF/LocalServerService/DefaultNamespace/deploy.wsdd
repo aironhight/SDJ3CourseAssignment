@@ -18,7 +18,10 @@
         <parameter xmlns:pns="http://DefaultNamespace" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:weight" type="tns:double"/>
         <parameter xmlns:pns="http://DefaultNamespace" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:parts" type="tns:string"/>
       </operation>
-      <parameter name="allowedMethods" value="registerCar"/>
+      <operation xmlns:operNS="http://DefaultNamespace" xmlns:retNS="http://DefaultNamespace" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="trackPart" qname="operNS:trackPart" returnQName="retNS:trackPartReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://DefaultNamespace" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:carVin" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="trackPart registerCar"/>
 
   </service>
 </deployment>

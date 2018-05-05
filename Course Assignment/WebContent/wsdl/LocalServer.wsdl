@@ -23,8 +23,30 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
+   <element name="trackPart">
+    <complexType>
+     <sequence>
+      <element name="carVin" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="trackPartResponse">
+    <complexType>
+     <sequence>
+      <element name="trackPartReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
   </schema>
  </wsdl:types>
+
+   <wsdl:message name="trackPartRequest">
+
+      <wsdl:part element="impl:trackPart" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
 
    <wsdl:message name="registerCarRequest">
 
@@ -37,6 +59,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <wsdl:message name="registerCarResponse">
 
       <wsdl:part element="impl:registerCarResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="trackPartResponse">
+
+      <wsdl:part element="impl:trackPartResponse" name="parameters">
 
       </wsdl:part>
 
@@ -56,6 +86,18 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="trackPart">
+
+         <wsdl:input message="impl:trackPartRequest" name="trackPartRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:trackPartResponse" name="trackPartResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
    </wsdl:portType>
 
    <wsdl:binding name="LocalServerSoapBinding" type="impl:LocalServer">
@@ -64,7 +106,7 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       <wsdl:operation name="registerCar">
 
-         <wsdlsoap:operation soapAction=""/>
+         <wsdlsoap:operation soapAction="http://example.com/GetLastTradePrice"/>
 
          <wsdl:input name="registerCarRequest">
 
@@ -73,6 +115,24 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          </wsdl:input>
 
          <wsdl:output name="registerCarResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="trackPart">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="trackPartRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="trackPartResponse">
 
             <wsdlsoap:body use="literal"/>
 
